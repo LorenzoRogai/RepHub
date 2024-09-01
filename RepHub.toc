@@ -1,9 +1,9 @@
 ## Interface: 110002
 ## Title: RepHub
-## Description: RepHub is an account-wide reputation tracker for World of Warcraft.
+## Description: RepHub is a simple account-wide reputation tracker
 ## Author: Alwayspizza
 ## SavedVariables: RepHubDB
 ## X-Curse-Project-ID: 1094884
 
-embeds.xml
+Libs.xml
 Rephub.lua
