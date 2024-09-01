@@ -26,6 +26,9 @@ function RepHub:OnInitialize()
         },
     })
     LibDBIcon:Register("RepHub", LibDataBroker, self.db.profile.minimap)
+end
+
+function RepHub:OnEnable()
     RepHub:RefreshReputationGlobalDB()
 end
 
