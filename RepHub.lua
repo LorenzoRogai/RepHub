@@ -1,6 +1,6 @@
 local RepHub = LibStub("AceAddon-3.0"):NewAddon("RepHub")
 local AceGUI = LibStub("AceGUI-3.0")
-local RepHubLDB = LibStub("LibDataBroker-1.1"):NewDataObject("RepHub", {
+local LibDataBroker = LibStub("LibDataBroker-1.1"):NewDataObject("RepHub", {
     type = "data source",
     text = "RepHub",
     icon = "Interface\\Icons\\Achievement_Reputation_01",
@@ -15,7 +15,6 @@ local LibDBIcon = LibStub("LibDBIcon-1.0")
 local RepHubFrameShown = false
 
 function RepHub:OnInitialize()
-    -- Assuming you have a ## SavedVariables: RepHubDB line in your TOC
     self.db = LibStub("AceDB-3.0"):New("RepHubDB", {
         profile = {
             minimap = {
@@ -26,7 +25,7 @@ function RepHub:OnInitialize()
             ReputationList = {},
         },
     })
-    LibDBIcon:Register("RepHub", RepHubLDB, self.db.profile.minimap)
+    LibDBIcon:Register("RepHub", LibDataBroker, self.db.profile.minimap)
     RepHub:RefreshReputationGlobalDB()
 end
 
@@ -101,8 +100,8 @@ function RepHub:ShowRepHubFrame()
     )
 
     local ScrollingTable = LibStub("ScrollingTable")
-    local Table = ScrollingTable:CreateST(columnsArr, 27, nil, nil, RepHubFrame.frame)
-    Table:SetData(dataArr, true)
+    local RepHubTable = ScrollingTable:CreateST(columnsArr, 27, nil, nil, RepHubFrame.frame)
+    RepHubTable:SetData(dataArr, true)
 
     RepHubFrameShown = true
 end
