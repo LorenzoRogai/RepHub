@@ -1,4 +1,4 @@
-local RepHub = LibStub("AceAddon-3.0"):NewAddon("RepHub")
+local RepHub = LibStub("AceAddon-3.0"):NewAddon("RepHub", "AceConsole-3.0")
 local AceGUI = LibStub("AceGUI-3.0")
 local LibDataBroker = LibStub("LibDataBroker-1.1"):NewDataObject("RepHub", {
     type = "data source",
@@ -26,10 +26,18 @@ function RepHub:OnInitialize()
         },
     })
     LibDBIcon:Register("RepHub", LibDataBroker, self.db.profile.minimap)
+    RepHub:RegisterChatCommand("rephub", "HandleCommand")
 end
 
 function RepHub:OnEnable()
     RepHub:RefreshReputationGlobalDB()
+end
+
+function RepHub:HandleCommand(input)
+    if input == "resetdb" then
+        self.db.global.ReputationList = {}
+        ReloadUI()
+    end
 end
 
 function RepHub:RefreshReputationGlobalDB()
