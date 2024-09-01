@@ -1,0 +1,9 @@
+## Interface: 110002
+## Title: RepHub
+## Description: RepHub is an account-wide reputation tracker for World of Warcraft.
+## Author: Alwayspizza
+## SavedVariables: RepHubDB
+## OptionalDeps: Ace3, LibDataBroker-1.1, LibDBIcon-1.0
+
+embeds.xml
+Rephub.lua
