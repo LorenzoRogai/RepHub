@@ -8,7 +8,7 @@ local LibDataBroker = LibStub("LibDataBroker-1.1"):NewDataObject("RepHub", {
         tooltip:AddLine("Click to show RepHub")
     end,
     OnClick = function()
-        RepHub:ShowRepHubFrame()
+        RepHub:ToggleRepHubFrame()
     end,
 })
 local LibDBIcon = LibStub("LibDBIcon-1.0")
@@ -80,8 +80,7 @@ function RepHub:CreateRepHubFrame()
     RepHubFrame:SetCallback(
         "OnClose",
         function(widget)
-            RepHubFrame.frame:Hide()
-            RepHubFrameShown = false
+            RepHub:HideRepHubFrame()
         end
     )
 
@@ -118,11 +117,19 @@ function RepHub:CreateRepHubFrame()
 end
 
 function RepHub:ShowRepHubFrame()
-    if RepHubFrameShown then
-        return
-    end
-
     RepHubFrame.frame:Show()
-
     RepHubFrameShown = true
+end
+
+function RepHub:HideRepHubFrame()
+    RepHubFrame.frame:Hide()
+    RepHubFrameShown = false
+end
+
+function RepHub:ToggleRepHubFrame()
+    if not RepHubFrameShown then
+        RepHub:ShowRepHubFrame()
+    else
+        RepHub:HideRepHubFrame()
+    end
 end
