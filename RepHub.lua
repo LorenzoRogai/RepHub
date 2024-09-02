@@ -12,6 +12,7 @@ local LibDataBroker = LibStub("LibDataBroker-1.1"):NewDataObject("RepHub", {
     end,
 })
 local LibDBIcon = LibStub("LibDBIcon-1.0")
+local RepHubFrame = nil
 local RepHubFrameShown = false
 
 function RepHub:OnInitialize()
@@ -27,6 +28,7 @@ function RepHub:OnInitialize()
     })
     LibDBIcon:Register("RepHub", LibDataBroker, self.db.profile.minimap)
     RepHub:RegisterChatCommand("rephub", "HandleCommand")
+    RepHub:CreateRepHubFrame()
 end
 
 function RepHub:OnEnable()
@@ -45,16 +47,14 @@ function RepHub:RefreshReputationGlobalDB()
 
     local currentGroup = nil
 
+    C_Reputation.ExpandAllFactionHeaders()
     local numFactions = C_Reputation.GetNumFactions()
     local factionIndex = 1
     while (factionIndex <= numFactions) do
         local factionData = C_Reputation.GetFactionDataByIndex(factionIndex)
         if factionData.isHeader then
-            currentGroup = factionData.name
-
-            if factionData.isCollapsed then
-                C_Reputation.ExpandFactionHeader(factionIndex)
-                numFactions = C_Reputation.GetNumFactions()
+            if not factionData.isHeaderWithRep then
+                currentGroup = factionData.name
             end
         end
         if self.db.global.ReputationList[factionData.factionID] == nil then
@@ -70,26 +70,23 @@ function RepHub:RefreshReputationGlobalDB()
     end
 end
 
-function RepHub:ShowRepHubFrame()
-    if RepHubFrameShown then
-        return
-    end
-
-    local RepHubFrame = AceGUI:Create("Frame")
+function RepHub:CreateRepHubFrame()
+    RepHubFrame = AceGUI:Create("Frame")
     RepHubFrame:SetTitle("RepHub")
     RepHubFrame:SetStatusText("RepHub is a simple account-wide reputation tracker")
     RepHubFrame:SetCallback(
         "OnClose",
         function(widget)
-            AceGUI:Release(widget)
+            RepHubFrame.frame:Hide()
             RepHubFrameShown = false
         end
     )
 
     local columnsArr = {
-        { ["name"] = "Rep Name", ["width"] = 205, },
-        { ["name"] = "Group", ["width"] = 205, },
-        { ["name"] = "Highest Standing", ["width"] = 205, },
+        { ["name"] = "Reputation Name", ["width"] = 155, },
+        { ["name"] = "Group", ["width"] = 155, },
+        { ["name"] = "Highest Standing", ["width"] = 155, },
+        { ["name"] = "Highest Standing Char Name", ["width"] = 155, },
     }
     local dataArr = {}
 
@@ -98,14 +95,14 @@ function RepHub:ShowRepHubFrame()
     table.foreach(
         self.db.global.ReputationList,
         function(factionID, factionData)
-            if not factionData.isHeader then
-                local highestStandingText = ""
+            if not factionData.isHeader or (factionData.isHeader and factionData.isHeaderWithRep) then
+                local highestStandingCharacterNameText = ""
                 if factionData.isAccountWide then
-                    highestStandingText = "Account-wide"
+                    highestStandingCharacterNameText = "Account-wide"
                 else
-                    highestStandingText = factionData.highestStanding .. " (" .. factionData.highestStandingCharacterName .. ")"
+                    highestStandingCharacterNameText = factionData.highestStandingCharacterName
                 end
-                table.insert(dataArr, {factionData.name, factionData.currentGroup, highestStandingText })
+                table.insert(dataArr, {factionData.name, factionData.currentGroup, factionData.highestStanding, highestStandingCharacterNameText})
             end
         end
     )
@@ -113,6 +110,16 @@ function RepHub:ShowRepHubFrame()
     local ScrollingTable = LibStub("ScrollingTable")
     local RepHubTable = ScrollingTable:CreateST(columnsArr, 27, nil, nil, RepHubFrame.frame)
     RepHubTable:SetData(dataArr, true)
+
+    RepHubFrame.frame:Hide()
+end
+
+function RepHub:ShowRepHubFrame()
+    if RepHubFrameShown then
+        return
+    end
+
+    RepHubFrame.frame:Show()
 
     RepHubFrameShown = true
 end
