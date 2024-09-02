@@ -28,11 +28,14 @@ function RepHub:OnInitialize()
     })
     LibDBIcon:Register("RepHub", LibDataBroker, self.db.profile.minimap)
     RepHub:RegisterChatCommand("rephub", "HandleCommand")
-    RepHub:CreateRepHubFrame()
 end
 
 function RepHub:OnEnable()
     RepHub:RefreshReputationGlobalDB()
+
+    if RepHubFrame == nil then
+        RepHub:CreateRepHubFrame()
+    end
 end
 
 function RepHub:HandleCommand(input)
