@@ -52,10 +52,10 @@ function RepHub:GetStandingsCount(standingsTable)
 end
 
 function RepHub:FindHighestStanding(standingsTable)
-    local highestStanding = 0
+    local highestStanding = nil
     local highestStandingCharacterName = nil
     for key, value in pairs(standingsTable) do
-        if RepHub:GetStandingsCount(standingsTable) == 1 or value > highestStanding then
+        if highestStanding == nil or value > highestStanding then
             highestStanding = value
             highestStandingCharacterName = key
         end
