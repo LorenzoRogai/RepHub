@@ -45,6 +45,24 @@ function RepHub:HandleCommand(input)
     end
 end
 
+function RepHub:GetStandingsCount(standingsTable)
+    local count = 0
+    for _ in pairs(standingsTable) do count = count + 1 end
+    return count
+end
+
+function RepHub:FindHighestStanding(standingsTable)
+    local highestStanding = 0
+    local highestStandingCharacterName = nil
+    for key, value in pairs(standingsTable) do
+        if RepHub:GetStandingsCount(standingsTable) == 1 or value > highestStanding then
+            highestStanding = value
+            highestStandingCharacterName = key
+        end
+    end
+    return highestStanding, highestStandingCharacterName
+end
+
 function RepHub:RefreshReputationGlobalDB()
     local characterName = UnitName("player")
 
@@ -60,15 +78,23 @@ function RepHub:RefreshReputationGlobalDB()
                 currentGroup = factionData.name
             end
         end
-        if self.db.global.ReputationList[factionData.factionID] == nil then
-            self.db.global.ReputationList[factionData.factionID] = factionData
-            self.db.global.ReputationList[factionData.factionID].currentGroup = currentGroup
-            self.db.global.ReputationList[factionData.factionID].highestStanding = factionData.currentStanding
-            self.db.global.ReputationList[factionData.factionID].highestStandingCharacterName = characterName
-        elseif self.db.global.ReputationList[factionData.factionID].highestStanding < factionData.currentStanding and not factionData.isAccountWide then
-            self.db.global.ReputationList[factionData.factionID].highestStanding = factionData.currentStanding
-            self.db.global.ReputationList[factionData.factionID].highestStandingCharacterName = characterName
+
+        local standings = {}
+        if self.db.global.ReputationList[factionData.factionID] then
+            standings = self.db.global.ReputationList[factionData.factionID].standings or {}
         end
+
+        standings[characterName] = factionData.currentStanding
+
+        self.db.global.ReputationList[factionData.factionID] = {
+            ["name"] = factionData.name,
+            ["currentGroup"] = currentGroup,
+            ["isHeader"] = factionData.isHeader,
+            ["isHeaderWithRep"] = factionData.isHeaderWithRep,
+            ["isAccountWide"] = factionData.isAccountWide,
+            ["standings"] = standings
+        }
+
         factionIndex = factionIndex + 1
     end
 end
@@ -88,9 +114,10 @@ function RepHub:CreateRepHubFrame()
 
     local columnsArr = {
         { ["name"] = "Reputation Name", ["width"] = 155, },
-        { ["name"] = "Group", ["width"] = 155, },
-        { ["name"] = "Highest Standing", ["width"] = 155, },
-        { ["name"] = "Highest Standing Char Name", ["width"] = 155, },
+        { ["name"] = "Group", ["width"] = 140, },
+        { ["name"] = "Highest Standing", ["width"] = 105, ["sort"] = "asc", },
+        { ["name"] = "H. S. Char Name", ["width"] = 125, },
+        { ["name"] = "Char Count", ["width"] = 95, },
     }
     local dataArr = {}
 
@@ -100,13 +127,15 @@ function RepHub:CreateRepHubFrame()
         self.db.global.ReputationList,
         function(factionID, factionData)
             if not factionData.isHeader or (factionData.isHeader and factionData.isHeaderWithRep) then
-                local highestStandingCharacterNameText = ""
+                local highestStandingText, highestStandingCharacterNameText, charCountText = ""
                 if factionData.isAccountWide then
+                    highestStandingText, charCountText = "--", "--"
                     highestStandingCharacterNameText = "Account-wide"
                 else
-                    highestStandingCharacterNameText = factionData.highestStandingCharacterName
+                    highestStandingText, highestStandingCharacterNameText = RepHub:FindHighestStanding(factionData.standings)
+                    charCountText = RepHub:GetStandingsCount(factionData.standings)
                 end
-                table.insert(dataArr, {factionData.name, factionData.currentGroup, factionData.highestStanding, highestStandingCharacterNameText})
+                table.insert(dataArr, {factionData.name, factionData.currentGroup, highestStandingText, highestStandingCharacterNameText, charCountText})
             end
         end
     )
