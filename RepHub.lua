@@ -77,6 +77,7 @@ function RepHub:CreateRepHubFrame()
     RepHubFrame = AceGUI:Create("Frame")
     RepHubFrame:SetTitle("RepHub")
     RepHubFrame:SetStatusText("RepHub is a simple account-wide reputation tracker")
+    RepHubFrame.frame:SetMovable(true)
     RepHubFrame:SetCallback(
         "OnClose",
         function(widget)
