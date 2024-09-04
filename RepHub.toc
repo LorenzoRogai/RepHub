@@ -5,6 +5,8 @@
 ## SavedVariables: RepHubDB
 ## IconTexture: Interface\Icons\Achievement_Reputation_01
 ## X-Curse-Project-ID: 1094884
+## X-WoWI-ID: 26841
+## X-Wago-ID: E6gL2OK1
 
 Libs.xml
 Rephub.lua
