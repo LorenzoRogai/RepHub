@@ -79,21 +79,18 @@ function RepHub:RefreshReputationGlobalDB()
             end
         end
 
-        local standings = {}
-        if self.db.global.ReputationList[factionData.factionID] then
-            standings = self.db.global.ReputationList[factionData.factionID].standings or {}
+        if not self.db.global.ReputationList[factionData.factionID] then
+            self.db.global.ReputationList[factionData.factionID] = {
+                ["name"] = factionData.name,
+                ["currentGroup"] = currentGroup,
+                ["isHeader"] = factionData.isHeader,
+                ["isHeaderWithRep"] = factionData.isHeaderWithRep,
+                ["isAccountWide"] = factionData.isAccountWide,
+                ["standings"] = {}
+            }
         end
 
-        standings[characterName] = factionData.currentStanding
-
-        self.db.global.ReputationList[factionData.factionID] = {
-            ["name"] = factionData.name,
-            ["currentGroup"] = currentGroup,
-            ["isHeader"] = factionData.isHeader,
-            ["isHeaderWithRep"] = factionData.isHeaderWithRep,
-            ["isAccountWide"] = factionData.isAccountWide,
-            ["standings"] = standings
-        }
+        self.db.global.ReputationList[factionData.factionID].standings[characterName] = factionData.currentStanding
 
         factionIndex = factionIndex + 1
     end
