@@ -12,8 +12,7 @@ local LibDataBroker = LibStub("LibDataBroker-1.1"):NewDataObject("RepHub", {
     end,
 })
 local LibDBIcon = LibStub("LibDBIcon-1.0")
-local RepHubFrame = nil
-local RepHubFrameShown = false
+local RepHubFrameShown, RepHubFrame, RepHubTable, filterValue = false, nil, nil, nil
 
 function RepHub:OnInitialize()
     self.db = LibStub("AceDB-3.0"):New("RepHubDB", {
@@ -23,6 +22,7 @@ function RepHub:OnInitialize()
             },
         },
         global = {
+            characterNames = {},
             ReputationList = {},
         },
     })
@@ -63,8 +63,23 @@ function RepHub:FindHighestStanding(standingsTable)
     return highestStanding, highestStandingCharacterName
 end
 
+function RepHub:FilterFunction(row)
+    local showRow = false
+    for rowKey, rowValue in pairs(row) do
+        if string.find(string.lower(rowValue), string.lower(filterValue)) then
+            showRow = true
+            break
+        end
+    end
+    return showRow
+end
+
 function RepHub:RefreshReputationGlobalDB()
     local characterName = UnitName("player")
+
+    if not tContains(self.db.global.characterNames, characterName) then
+        table.insert(self.db.global.characterNames, characterName)
+    end
 
     local currentGroup = nil
 
@@ -108,6 +123,23 @@ function RepHub:CreateRepHubFrame()
             RepHub:HideRepHubFrame()
         end
     )
+    
+    local StatsLabel = AceGUI:Create("Label")
+    StatsLabel:SetFullWidth(true)
+    StatsLabel:SetText("Total reputations: " .. RepHub:GetStandingsCount(self.db.global.ReputationList)  .. " | Total characters: " .. #self.db.global.characterNames)
+    RepHubFrame:AddChild(StatsLabel)
+
+    local SearchBox = AceGUI:Create("EditBox")
+    SearchBox:SetFullWidth(true)
+    SearchBox:SetLabel("Search:")
+    SearchBox:SetCallback(
+        "OnEnterPressed",
+        function(widget, event, text)
+            filterValue = text
+            RepHubTable:SetFilter(RepHub.FilterFunction)
+        end
+    )
+    RepHubFrame:AddChild(SearchBox)
 
     local columnsArr = {
         { ["name"] = "Reputation Name", ["width"] = 155, },
@@ -137,9 +169,16 @@ function RepHub:CreateRepHubFrame()
         end
     )
 
+    local RepHubTableGroup = AceGUI:Create("SimpleGroup")
+    RepHubTableGroup:SetFullWidth(true)
+    RepHubTableGroup:SetHeight(390)
+    RepHubTableGroup:SetLayout("Fill")
+
     local ScrollingTable = LibStub("ScrollingTable")
-    local RepHubTable = ScrollingTable:CreateST(columnsArr, 27, nil, nil, RepHubFrame.frame)
+    RepHubTable = ScrollingTable:CreateST(columnsArr, 23, nil, nil, RepHubTableGroup.frame)
     RepHubTable:SetData(dataArr, true)
+
+    RepHubFrame:AddChild(RepHubTableGroup)
 
     RepHubFrame.frame:Hide()
 end
