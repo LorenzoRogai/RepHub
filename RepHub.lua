@@ -60,7 +60,7 @@ function RepHub:CheckDB()
 
         local needResetLabel = AceGUI:Create("Label")
         needResetLabel:SetFullWidth(true)
-        needResetLabel:SetText("Your RepHub database needs to be reset for these reasons:\n\n- " .. table.concat(needResetReasons, "\n - ") .. "\n\nClick the button below to reset it\nSorry for the inconvenience\n\n")
+        needResetLabel:SetText("Your RepHub database needs to be reset for these reasons:\n\n- " .. table.concat(needResetReasons, "\n- ") .. "\n\nClick the button below to reset it\nSorry for the inconvenience\n\n")
         needResetFrame:AddChild(needResetLabel)
 
         local needResetButton = AceGUI:Create("Button")
