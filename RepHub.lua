@@ -23,7 +23,7 @@ function RepHub:OnInitialize()
         },
         global = {
             characterNames = {},
-            ReputationList = {},
+            reputationList = {},
         },
     })
     LibDBIcon:Register("RepHub", LibDataBroker, self.db.profile.minimap)
@@ -31,6 +31,7 @@ function RepHub:OnInitialize()
 end
 
 function RepHub:OnEnable()
+    RepHub:CheckDB()
     RepHub:RefreshReputationGlobalDB()
 
     if RepHubFrame == nil then
@@ -38,10 +39,48 @@ function RepHub:OnEnable()
     end
 end
 
+function RepHub:CheckDB()
+    local needReset = false
+    local needResetReasons = {}
+
+    if tContains(self.db.global.characterNames, UnitName("player")) then
+        needReset = true
+        table.insert(needResetReasons, "Realm name should be considered")
+    end
+
+    if needReset then
+        local needResetFrame = AceGUI:Create("Frame")
+        needResetFrame:SetTitle("RepHub")
+        needResetFrame:SetStatusText("RepHub is a simple account-wide reputation tracker")
+        needResetFrame:SetCallback("OnClose", function(widget) AceGUI:Release(widget) end)
+        needResetFrame:SetWidth(250)
+        needResetFrame:SetHeight(175)
+        needResetFrame.frame:SetMovable(false)
+        needResetFrame.frame:SetResizable(false)
+
+        local needResetLabel = AceGUI:Create("Label")
+        needResetLabel:SetFullWidth(true)
+        needResetLabel:SetText("Your RepHub database needs to be reset for these reasons:\n\n- " .. table.concat(needResetReasons, "\n - ") .. "\n\nClick the button below to reset it\nSorry for the inconvenience\n\n")
+        needResetFrame:AddChild(needResetLabel)
+
+        local needResetButton = AceGUI:Create("Button")
+        needResetButton:SetFullWidth(true)
+        needResetButton:SetText("Reset DB")
+        needResetButton:SetCallback("OnClick", function() RepHub:ResetDB() end)
+        needResetFrame:AddChild(needResetButton)
+
+        needResetFrame:Show()
+    end
+end
+
+function RepHub:ResetDB()
+    self.db:ResetDB()
+    ReloadUI()
+end
+
 function RepHub:HandleCommand(input)
     if input == "resetdb" then
-        self.db.global.ReputationList = {}
-        ReloadUI()
+        RepHub:ResetDB()
     end
 end
 
@@ -75,7 +114,7 @@ function RepHub:FilterFunction(row)
 end
 
 function RepHub:RefreshReputationGlobalDB()
-    local characterName = UnitName("player")
+    local characterName = UnitName("player") .. " - " .. GetRealmName()
 
     if not tContains(self.db.global.characterNames, characterName) then
         table.insert(self.db.global.characterNames, characterName)
@@ -94,8 +133,8 @@ function RepHub:RefreshReputationGlobalDB()
             end
         end
 
-        if not self.db.global.ReputationList[factionData.factionID] then
-            self.db.global.ReputationList[factionData.factionID] = {
+        if not self.db.global.reputationList[factionData.factionID] then
+            self.db.global.reputationList[factionData.factionID] = {
                 ["name"] = factionData.name,
                 ["currentGroup"] = currentGroup,
                 ["isHeader"] = factionData.isHeader,
@@ -105,7 +144,7 @@ function RepHub:RefreshReputationGlobalDB()
             }
         end
 
-        self.db.global.ReputationList[factionData.factionID].standings[characterName] = factionData.currentStanding
+        self.db.global.reputationList[factionData.factionID].standings[characterName] = factionData.currentStanding
 
         factionIndex = factionIndex + 1
     end
@@ -126,7 +165,7 @@ function RepHub:CreateRepHubFrame()
     
     local StatsLabel = AceGUI:Create("Label")
     StatsLabel:SetFullWidth(true)
-    StatsLabel:SetText("Total reputations: " .. RepHub:GetStandingsCount(self.db.global.ReputationList)  .. " | Total characters: " .. #self.db.global.characterNames)
+    StatsLabel:SetText("Total reputations: " .. RepHub:GetStandingsCount(self.db.global.reputationList)  .. " | Total characters: " .. #self.db.global.characterNames)
     RepHubFrame:AddChild(StatsLabel)
 
     local SearchBox = AceGUI:Create("EditBox")
@@ -145,15 +184,15 @@ function RepHub:CreateRepHubFrame()
         { ["name"] = "Reputation Name", ["width"] = 155, },
         { ["name"] = "Group", ["width"] = 140, },
         { ["name"] = "Highest Standing", ["width"] = 105, ["sort"] = "asc", },
-        { ["name"] = "H. S. Char Name", ["width"] = 125, },
-        { ["name"] = "Char Count", ["width"] = 95, },
+        { ["name"] = "H. S. Char Name", ["width"] = 155, },
+        { ["name"] = "Char Count", ["width"] = 65, },
     }
     local dataArr = {}
 
     local characterName = UnitName("player")
 
     table.foreach(
-        self.db.global.ReputationList,
+        self.db.global.reputationList,
         function(factionID, factionData)
             if not factionData.isHeader or (factionData.isHeader and factionData.isHeaderWithRep) then
                 local highestStandingText, highestStandingCharacterNameText, charCountText = ""
