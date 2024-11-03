@@ -189,8 +189,6 @@ function RepHub:CreateRepHubFrame()
     }
     local dataArr = {}
 
-    local characterName = UnitName("player")
-
     table.foreach(
         self.db.global.reputationList,
         function(factionID, factionData)
