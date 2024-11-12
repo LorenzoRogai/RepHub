@@ -12,7 +12,11 @@ local LibDataBroker = LibStub("LibDataBroker-1.1"):NewDataObject("RepHub", {
     end,
 })
 local LibDBIcon = LibStub("LibDBIcon-1.0")
-local RepHubFrameShown, RepHubFrame, RepHubTable, filterValue = false, nil, nil, nil
+local RepHubFrameShown,
+        RepHubFrame,
+        RepHubFactionDetailFrameShown,
+        RepHubTable,
+        filterValue = false, nil, nil, nil, nil
 
 function RepHub:OnInitialize()
     self.db = LibStub("AceDB-3.0"):New("RepHubDB", {
@@ -111,6 +115,19 @@ function RepHub:FilterFunction(row)
         end
     end
     return showRow
+end
+
+function RepHub:GetFactionDataByName(factionName)
+    local factionDataResult = nil
+    table.foreach(
+        self.db.global.reputationList,
+        function(factionID, factionData)
+            if factionData.name == factionName then
+                factionDataResult = factionData
+            end
+        end
+    )
+    return factionDataResult
 end
 
 function RepHub:RefreshReputationGlobalDB()
@@ -214,10 +231,65 @@ function RepHub:CreateRepHubFrame()
     local ScrollingTable = LibStub("ScrollingTable")
     RepHubTable = ScrollingTable:CreateST(columnsArr, 23, nil, nil, RepHubTableGroup.frame)
     RepHubTable:SetData(dataArr, true)
+    RepHubTable:RegisterEvents({
+        ["OnClick"] = function (rowFrame, cellFrame, data, cols, row, realrow, column, table, button, ...)
+            if realrow then
+                local rowdata = RepHubTable:GetRow(realrow)
+                local factionName = RepHubTable:GetCell(rowdata, 1)
+                RepHub:ShowFactionDetailFrame(factionName)
+            end
+        end,
+    });
 
     RepHubFrame:AddChild(RepHubTableGroup)
 
     RepHubFrame.frame:Hide()
+end
+
+function RepHub:ShowFactionDetailFrame(factionName)
+    if RepHubFactionDetailFrameShown then
+        print("RepHub: Close the current faction detail first")
+        return
+    end
+
+    local factionData = RepHub:GetFactionDataByName(factionName)
+
+    if factionData.isAccountWide then
+        return
+    end
+
+    local factionDetailFrame = AceGUI:Create("Frame")
+    factionDetailFrame:SetTitle(factionName)
+    factionDetailFrame:SetStatusText("Char Count: " .. RepHub:GetStandingsCount(factionData.standings))
+    factionDetailFrame:SetCallback(
+        "OnClose",
+        function(widget)
+            AceGUI:Release(widget)
+            RepHubFactionDetailFrameShown = false
+        end
+    )
+    factionDetailFrame:SetWidth(250)
+    factionDetailFrame:SetHeight(175)
+    factionDetailFrame:SetPoint("TOPLEFT", UIParent, "TOPLEFT", 100, -100)
+    factionDetailFrame.frame:SetMovable(false)
+    factionDetailFrame.frame:SetResizable(false)
+
+    local factionDetailText = ""
+
+    table.foreach(
+        factionData.standings,
+        function(characterName, standing)
+            factionDetailText = factionDetailText .. characterName .. ": " .. standing .. "\n"
+        end
+    )
+
+    local factionDetailLabel = AceGUI:Create("Label")
+    factionDetailLabel:SetFullWidth(true)
+    factionDetailLabel:SetText(factionDetailText)
+    factionDetailFrame:AddChild(factionDetailLabel)
+
+    factionDetailFrame:Show()
+    RepHubFactionDetailFrameShown = true
 end
 
 function RepHub:ShowRepHubFrame()
