@@ -276,10 +276,20 @@ function RepHub:ShowFactionDetailFrame(factionName)
 
     local factionDetailText = ""
 
+    local sortedStandings = {}
     table.foreach(
         factionData.standings,
         function(characterName, standing)
-            factionDetailText = factionDetailText .. characterName .. ": " .. standing .. "\n"
+            table.insert(sortedStandings, { ["characterName"] = characterName, ["standing"] = standing })
+        end
+    )
+
+    table.sort(sortedStandings, function(a, b) return a.standing > b.standing end)
+
+    table.foreach(
+        sortedStandings,
+        function(k, v)
+            factionDetailText = factionDetailText .. v.characterName .. ": " .. v.standing .. "\n"
         end
     )
 
