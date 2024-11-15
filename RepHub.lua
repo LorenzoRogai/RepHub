@@ -168,12 +168,30 @@ function RepHub:RefreshReputationGlobalDB()
     end
 end
 
+local pendingUpdateFactionEvent = false
+
 function RepHub:CreateRepHubFrame()
     RepHubFrame = AceGUI:Create("Frame")
     RepHubFrame:SetTitle("RepHub")
     RepHubFrame:SetStatusText("RepHub is a simple account-wide reputation tracker")
     RepHubFrame.frame:SetMovable(true)
     RepHubFrame.frame:SetResizable(false)
+    RepHubFrame.frame:RegisterEvent("UPDATE_FACTION");
+    RepHubFrame.frame:SetScript(
+        "OnEvent",
+        function(self, event, ...)
+            pendingUpdateFactionEvent = true
+        end
+    )
+    C_Timer.NewTicker(
+        10,
+        function()
+            if pendingUpdateFactionEvent then
+                RepHub:RefreshReputationGlobalDB()
+                pendingUpdateFactionEvent = false
+            end
+        end
+    )
     RepHubFrame:SetCallback(
         "OnClose",
         function(widget)
