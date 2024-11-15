@@ -17,6 +17,7 @@ local RepHubFrameShown,
         RepHubFactionDetailFrameShown,
         RepHubTable,
         filterValue = false, nil, nil, nil, nil
+local SORT_ASC, SORT_DESC = 1, 2
 
 function RepHub:OnInitialize()
     self.db = LibStub("AceDB-3.0"):New("RepHubDB", {
@@ -200,7 +201,31 @@ function RepHub:CreateRepHubFrame()
     local columnsArr = {
         { ["name"] = "Reputation Name", ["width"] = 155, },
         { ["name"] = "Group", ["width"] = 140, },
-        { ["name"] = "Highest Standing", ["width"] = 105, ["sort"] = "asc", },
+        {
+            ["name"] = "Highest Standing", ["width"] = 105, ["sort"] = "asc", ["comparesort"] = function (libSt, rowa, rowb, column)
+                local cellaValue, cellbValue = libSt:GetCell(rowa, column), libSt:GetCell(rowb, column);
+
+                local cellaBracketPosition = cellaValue:find("(", 1, true)
+                if cellaBracketPosition then
+                    cellaValue = tonumber(cellaValue:sub(1, cellaBracketPosition - 2))
+                else
+                    cellaValue = -50000
+                end
+
+                local cellbBracketPosition = cellbValue:find("(", 1, true)
+                if cellbBracketPosition then
+                    cellbValue = tonumber(cellbValue:sub(1, cellbBracketPosition - 2))
+                else
+                    cellbValue = -50000
+                end
+
+                if libSt.cols[column].sort == SORT_ASC then
+                    return cellaValue < cellbValue;
+                else
+                    return cellaValue > cellbValue;
+                end
+            end
+        },
         { ["name"] = "H. S. Char Name", ["width"] = 155, },
         { ["name"] = "Char Count", ["width"] = 65, },
     }
@@ -216,6 +241,7 @@ function RepHub:CreateRepHubFrame()
                     highestStandingCharacterNameText = "Account-wide"
                 else
                     highestStandingText, highestStandingCharacterNameText = RepHub:FindHighestStanding(factionData.standings)
+                    highestStandingText = highestStandingText .. " (" .. RepHub:GetReputationLabel(highestStandingText) .. ")"
                     charCountText = RepHub:GetStandingsCount(factionData.standings)
                 end
                 table.insert(dataArr, {factionData.name, factionData.currentGroup, highestStandingText, highestStandingCharacterNameText, charCountText})
@@ -244,6 +270,36 @@ function RepHub:CreateRepHubFrame()
     RepHubFrame:AddChild(RepHubTableGroup)
 
     RepHubFrame.frame:Hide()
+end
+
+local reputationLabels =  {
+    [-42000] = "Hated",
+    [-6000] = "Hostile",
+    [-3000] = "Unfriendly",
+    [0] = "Neutral",
+    [3000] = "Friendly",
+    [9000] = "Honored",
+    [21000] = "Revered",
+    [42000] = "Exalted",
+}
+
+function RepHub:GetReputationLabel(standing)
+    local reputationLabelResult = nil
+    local sortedKeys = {}
+    
+    for reputationValue in pairs(reputationLabels) do
+        table.insert(sortedKeys, reputationValue)
+    end
+    
+    table.sort(sortedKeys)
+
+    for _, reputationValue in ipairs(sortedKeys) do
+        if standing >= reputationValue then
+            reputationLabelResult = reputationLabels[reputationValue]
+        end
+    end
+    
+    return reputationLabelResult
 end
 
 function RepHub:ShowFactionDetailFrame(factionName)
@@ -288,8 +344,8 @@ function RepHub:ShowFactionDetailFrame(factionName)
 
     table.foreach(
         sortedStandings,
-        function(k, v)
-            factionDetailText = factionDetailText .. v.characterName .. ": " .. v.standing .. "\n"
+        function(_, v)
+            factionDetailText = factionDetailText .. v.characterName .. ": " .. v.standing .. " (" .. RepHub:GetReputationLabel(v.standing) .. ")\n"
         end
     )
 
