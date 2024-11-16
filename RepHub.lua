@@ -58,6 +58,8 @@ function RepHub:OnEnable()
     end
 end
 
+-- Database
+
 function RepHub:CheckDB()
     local needReset = false
     local needResetReasons = {}
@@ -92,16 +94,57 @@ function RepHub:CheckDB()
     end
 end
 
+function RepHub:RefreshReputationGlobalDB()
+    local characterName = UnitName("player") .. " - " .. GetRealmName()
+
+    if not tContains(self.db.global.characterNames, characterName) then
+        table.insert(self.db.global.characterNames, characterName)
+    end
+
+    local currentGroup = nil
+
+    C_Reputation.ExpandAllFactionHeaders()
+    local numFactions = C_Reputation.GetNumFactions()
+    local factionIndex = 1
+    while (factionIndex <= numFactions) do
+        local factionData = C_Reputation.GetFactionDataByIndex(factionIndex)
+        if factionData.isHeader then
+            if not factionData.isHeaderWithRep then
+                currentGroup = factionData.name
+            end
+        end
+
+        if not self.db.global.reputationList[factionData.factionID] then
+            self.db.global.reputationList[factionData.factionID] = {
+                ["name"] = factionData.name,
+                ["currentGroup"] = currentGroup,
+                ["isHeader"] = factionData.isHeader,
+                ["isHeaderWithRep"] = factionData.isHeaderWithRep,
+                ["isAccountWide"] = factionData.isAccountWide,
+                ["standings"] = {}
+            }
+        end
+
+        self.db.global.reputationList[factionData.factionID].standings[characterName] = factionData.currentStanding
+
+        factionIndex = factionIndex + 1
+    end
+end
+
 function RepHub:ResetDB()
     self.db:ResetDB()
     ReloadUI()
 end
+
+-- Commands
 
 function RepHub:HandleCommand(input)
     if input == "resetdb" then
         RepHub:ResetDB()
     end
 end
+
+-- Utils
 
 function RepHub:GetStandingsCount(standingsTable)
     local count = 0
@@ -145,42 +188,50 @@ function RepHub:GetFactionDataByName(factionName)
     return factionDataResult
 end
 
-function RepHub:RefreshReputationGlobalDB()
-    local characterName = UnitName("player") .. " - " .. GetRealmName()
+function RepHub:HighestStandingSort(libSt, rowa, rowb, column)
+    local cellaValue, cellbValue = libSt:GetCell(rowa, column), libSt:GetCell(rowb, column);
 
-    if not tContains(self.db.global.characterNames, characterName) then
-        table.insert(self.db.global.characterNames, characterName)
+    local cellaBracketPosition = cellaValue:find("(", 1, true)
+    if cellaBracketPosition then
+        cellaValue = tonumber(cellaValue:sub(1, cellaBracketPosition - 2))
+    else
+        cellaValue = -50000
     end
 
-    local currentGroup = nil
+    local cellbBracketPosition = cellbValue:find("(", 1, true)
+    if cellbBracketPosition then
+        cellbValue = tonumber(cellbValue:sub(1, cellbBracketPosition - 2))
+    else
+        cellbValue = -50000
+    end
 
-    C_Reputation.ExpandAllFactionHeaders()
-    local numFactions = C_Reputation.GetNumFactions()
-    local factionIndex = 1
-    while (factionIndex <= numFactions) do
-        local factionData = C_Reputation.GetFactionDataByIndex(factionIndex)
-        if factionData.isHeader then
-            if not factionData.isHeaderWithRep then
-                currentGroup = factionData.name
-            end
-        end
-
-        if not self.db.global.reputationList[factionData.factionID] then
-            self.db.global.reputationList[factionData.factionID] = {
-                ["name"] = factionData.name,
-                ["currentGroup"] = currentGroup,
-                ["isHeader"] = factionData.isHeader,
-                ["isHeaderWithRep"] = factionData.isHeaderWithRep,
-                ["isAccountWide"] = factionData.isAccountWide,
-                ["standings"] = {}
-            }
-        end
-
-        self.db.global.reputationList[factionData.factionID].standings[characterName] = factionData.currentStanding
-
-        factionIndex = factionIndex + 1
+    if libSt.cols[column].sort == SORT_ASC then
+        return cellaValue < cellbValue;
+    else
+        return cellaValue > cellbValue;
     end
 end
+
+function RepHub:GetReputationLabel(standing)
+    local reputationLabelResult = nil
+    local sortedKeys = {}
+    
+    for reputationValue in pairs(reputationLabels) do
+        table.insert(sortedKeys, reputationValue)
+    end
+    
+    table.sort(sortedKeys)
+
+    for _, reputationValue in ipairs(sortedKeys) do
+        if standing >= reputationValue then
+            reputationLabelResult = reputationLabels[reputationValue]
+        end
+    end
+    
+    return reputationLabelResult
+end
+
+-- GUI
 
 function RepHub:CreateRepHubFrame()
     RepHubFrame = AceGUI:Create("Frame")
@@ -280,49 +331,6 @@ function RepHub:CreateRepHubFrame()
     RepHubFrame:AddChild(RepHubTableGroup)
 
     RepHubFrame.frame:Hide()
-end
-
-function RepHub:HighestStandingSort(libSt, rowa, rowb, column)
-    local cellaValue, cellbValue = libSt:GetCell(rowa, column), libSt:GetCell(rowb, column);
-
-    local cellaBracketPosition = cellaValue:find("(", 1, true)
-    if cellaBracketPosition then
-        cellaValue = tonumber(cellaValue:sub(1, cellaBracketPosition - 2))
-    else
-        cellaValue = -50000
-    end
-
-    local cellbBracketPosition = cellbValue:find("(", 1, true)
-    if cellbBracketPosition then
-        cellbValue = tonumber(cellbValue:sub(1, cellbBracketPosition - 2))
-    else
-        cellbValue = -50000
-    end
-
-    if libSt.cols[column].sort == SORT_ASC then
-        return cellaValue < cellbValue;
-    else
-        return cellaValue > cellbValue;
-    end
-end
-
-function RepHub:GetReputationLabel(standing)
-    local reputationLabelResult = nil
-    local sortedKeys = {}
-    
-    for reputationValue in pairs(reputationLabels) do
-        table.insert(sortedKeys, reputationValue)
-    end
-    
-    table.sort(sortedKeys)
-
-    for _, reputationValue in ipairs(sortedKeys) do
-        if standing >= reputationValue then
-            reputationLabelResult = reputationLabels[reputationValue]
-        end
-    end
-    
-    return reputationLabelResult
 end
 
 function RepHub:ShowFactionDetailFrame(factionName)
