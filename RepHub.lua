@@ -16,8 +16,22 @@ local RepHubFrameShown,
         RepHubFrame,
         RepHubFactionDetailFrameShown,
         RepHubTable,
-        filterValue = false, nil, nil, nil, nil
-local SORT_ASC, SORT_DESC = 1, 2
+        filterValue,
+        SORT_ASC,
+        SORT_DESC,
+        pendingUpdateFactionEvent,
+        updateFactionEventInterval = false, nil, nil, nil, nil, 1, 2, false, 10
+
+local reputationLabels =  {
+    [-42000] = "Hated",
+    [-6000] = "Hostile",
+    [-3000] = "Unfriendly",
+    [0] = "Neutral",
+    [3000] = "Friendly",
+    [9000] = "Honored",
+    [21000] = "Revered",
+    [42000] = "Exalted",
+}
 
 function RepHub:OnInitialize()
     self.db = LibStub("AceDB-3.0"):New("RepHubDB", {
@@ -168,8 +182,6 @@ function RepHub:RefreshReputationGlobalDB()
     end
 end
 
-local pendingUpdateFactionEvent = false
-
 function RepHub:CreateRepHubFrame()
     RepHubFrame = AceGUI:Create("Frame")
     RepHubFrame:SetTitle("RepHub")
@@ -184,7 +196,7 @@ function RepHub:CreateRepHubFrame()
         end
     )
     C_Timer.NewTicker(
-        10,
+        updateFactionEventInterval,
         function()
             if pendingUpdateFactionEvent then
                 RepHub:RefreshReputationGlobalDB()
@@ -221,27 +233,7 @@ function RepHub:CreateRepHubFrame()
         { ["name"] = "Group", ["width"] = 140, },
         {
             ["name"] = "Highest Standing", ["width"] = 105, ["sort"] = "asc", ["comparesort"] = function (libSt, rowa, rowb, column)
-                local cellaValue, cellbValue = libSt:GetCell(rowa, column), libSt:GetCell(rowb, column);
-
-                local cellaBracketPosition = cellaValue:find("(", 1, true)
-                if cellaBracketPosition then
-                    cellaValue = tonumber(cellaValue:sub(1, cellaBracketPosition - 2))
-                else
-                    cellaValue = -50000
-                end
-
-                local cellbBracketPosition = cellbValue:find("(", 1, true)
-                if cellbBracketPosition then
-                    cellbValue = tonumber(cellbValue:sub(1, cellbBracketPosition - 2))
-                else
-                    cellbValue = -50000
-                end
-
-                if libSt.cols[column].sort == SORT_ASC then
-                    return cellaValue < cellbValue;
-                else
-                    return cellaValue > cellbValue;
-                end
+                return RepHub:HighestStandingSort(libSt, rowa, rowb, column)
             end
         },
         { ["name"] = "H. S. Char Name", ["width"] = 155, },
@@ -290,16 +282,29 @@ function RepHub:CreateRepHubFrame()
     RepHubFrame.frame:Hide()
 end
 
-local reputationLabels =  {
-    [-42000] = "Hated",
-    [-6000] = "Hostile",
-    [-3000] = "Unfriendly",
-    [0] = "Neutral",
-    [3000] = "Friendly",
-    [9000] = "Honored",
-    [21000] = "Revered",
-    [42000] = "Exalted",
-}
+function RepHub:HighestStandingSort(libSt, rowa, rowb, column)
+    local cellaValue, cellbValue = libSt:GetCell(rowa, column), libSt:GetCell(rowb, column);
+
+    local cellaBracketPosition = cellaValue:find("(", 1, true)
+    if cellaBracketPosition then
+        cellaValue = tonumber(cellaValue:sub(1, cellaBracketPosition - 2))
+    else
+        cellaValue = -50000
+    end
+
+    local cellbBracketPosition = cellbValue:find("(", 1, true)
+    if cellbBracketPosition then
+        cellbValue = tonumber(cellbValue:sub(1, cellbBracketPosition - 2))
+    else
+        cellbValue = -50000
+    end
+
+    if libSt.cols[column].sort == SORT_ASC then
+        return cellaValue < cellbValue;
+    else
+        return cellaValue > cellbValue;
+    end
+end
 
 function RepHub:GetReputationLabel(standing)
     local reputationLabelResult = nil
