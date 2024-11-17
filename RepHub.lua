@@ -22,7 +22,7 @@ local RepHubFrameShown,
         pendingUpdateFactionEvent,
         updateFactionEventInterval = false, nil, nil, nil, nil, 1, 2, false, 10
 
-local reputationLabels =  {
+local reputationLabels = {
     [-42000] = "Hated",
     [-6000] = "Hostile",
     [-3000] = "Unfriendly",
@@ -296,7 +296,7 @@ function RepHub:CreateRepHubFrame()
         self.db.global.reputationList,
         function(factionID, factionData)
             if not factionData.isHeader or (factionData.isHeader and factionData.isHeaderWithRep) then
-                local highestStandingText, highestStandingCharacterNameText, charCountText = ""
+                local highestStandingText, highestStandingCharacterNameText, charCountText = "", "", ""
                 if factionData.isAccountWide then
                     highestStandingText, charCountText = "--", "--"
                     highestStandingCharacterNameText = "Account-wide"
