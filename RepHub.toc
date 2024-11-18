@@ -1,7 +1,8 @@
 ## Interface: 110005
 ## Title: RepHub
-## Description: RepHub is a simple account-wide reputation tracker
+## Notes: RepHub is a simple account-wide reputation tracker
 ## Author: lorigio
+## Version: @project-version@
 ## SavedVariables: RepHubDB
 ## IconTexture: Interface\Icons\Achievement_Reputation_01
 ## X-Curse-Project-ID: 1094884
