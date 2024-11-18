@@ -146,19 +146,19 @@ end
 
 -- Utils
 
-function RepHub:GetStandingsCount(standingsTable)
+function RepHub:GetTableLength(table)
     local count = 0
-    for _ in pairs(standingsTable) do count = count + 1 end
+    for _, __ in pairs(table) do count = count + 1 end
     return count
 end
 
 function RepHub:FindHighestStanding(standingsTable)
     local highestStanding = nil
     local highestStandingCharacterName = nil
-    for key, value in pairs(standingsTable) do
-        if highestStanding == nil or value > highestStanding then
-            highestStanding = value
-            highestStandingCharacterName = key
+    for characterName, standing in pairs(standingsTable) do
+        if highestStanding == nil or standing > highestStanding then
+            highestStanding = standing
+            highestStandingCharacterName = characterName
         end
     end
     return highestStanding, highestStandingCharacterName
@@ -166,8 +166,8 @@ end
 
 function RepHub:FilterFunction(row)
     local showRow = false
-    for rowKey, rowValue in pairs(row) do
-        if string.find(string.lower(rowValue), string.lower(filterValue)) then
+    for _, columnValue in pairs(row) do
+        if string.find(string.lower(columnValue), string.lower(filterValue)) then
             showRow = true
             break
         end
@@ -216,7 +216,7 @@ function RepHub:GetReputationLabel(standing)
     local reputationLabelResult = nil
     local sortedKeys = {}
     
-    for reputationValue in pairs(reputationLabels) do
+    for reputationValue, _ in pairs(reputationLabels) do
         table.insert(sortedKeys, reputationValue)
     end
     
@@ -264,7 +264,7 @@ function RepHub:CreateRepHubFrame()
     
     local StatsLabel = AceGUI:Create("Label")
     StatsLabel:SetFullWidth(true)
-    StatsLabel:SetText("Total reputations: " .. RepHub:GetStandingsCount(self.db.global.reputationList)  .. " | Total characters: " .. #self.db.global.characterNames)
+    StatsLabel:SetText("Total reputations: " .. RepHub:GetTableLength(self.db.global.reputationList)  .. " | Total characters: " .. #self.db.global.characterNames)
     RepHubFrame:AddChild(StatsLabel)
 
     local SearchBox = AceGUI:Create("EditBox")
@@ -303,7 +303,7 @@ function RepHub:CreateRepHubFrame()
                 else
                     highestStandingText, highestStandingCharacterNameText = RepHub:FindHighestStanding(factionData.standings)
                     highestStandingText = highestStandingText .. " (" .. RepHub:GetReputationLabel(highestStandingText) .. ")"
-                    charCountText = RepHub:GetStandingsCount(factionData.standings)
+                    charCountText = RepHub:GetTableLength(factionData.standings)
                 end
                 table.insert(dataArr, {factionData.name, factionData.currentGroup, highestStandingText, highestStandingCharacterNameText, charCountText})
             end
@@ -347,7 +347,7 @@ function RepHub:ShowFactionDetailFrame(factionName)
 
     local factionDetailFrame = AceGUI:Create("Frame")
     factionDetailFrame:SetTitle(factionName)
-    factionDetailFrame:SetStatusText("Char Count: " .. RepHub:GetStandingsCount(factionData.standings))
+    factionDetailFrame:SetStatusText("Char Count: " .. RepHub:GetTableLength(factionData.standings))
     factionDetailFrame:SetCallback(
         "OnClose",
         function(widget)
@@ -375,8 +375,8 @@ function RepHub:ShowFactionDetailFrame(factionName)
 
     table.foreach(
         sortedStandings,
-        function(_, v)
-            factionDetailText = factionDetailText .. v.characterName .. ": " .. v.standing .. " (" .. RepHub:GetReputationLabel(v.standing) .. ")\n"
+        function(_, sortedStanding)
+            factionDetailText = factionDetailText .. sortedStanding.characterName .. ": " .. sortedStanding.standing .. " (" .. RepHub:GetReputationLabel(sortedStanding.standing) .. ")\n"
         end
     )
 
