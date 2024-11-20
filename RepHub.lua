@@ -189,7 +189,7 @@ function RepHub:GetFactionDataByName(factionName)
 end
 
 function RepHub:HighestStandingSort(libSt, rowa, rowb, column)
-    local cellaValue, cellbValue = libSt:GetCell(rowa, column), libSt:GetCell(rowb, column);
+    local cellaValue, cellbValue = libSt:GetCell(rowa, column), libSt:GetCell(rowb, column)
 
     local cellaBracketPosition = cellaValue:find("(", 1, true)
     if cellaBracketPosition then
@@ -239,11 +239,19 @@ function RepHub:CreateRepHubFrame()
     RepHubFrame:SetStatusText("RepHub is a simple account-wide reputation tracker")
     RepHubFrame.frame:SetMovable(true)
     RepHubFrame.frame:SetResizable(false)
-    RepHubFrame.frame:RegisterEvent("UPDATE_FACTION");
+    RepHubFrame.frame:RegisterEvent("UPDATE_FACTION")
+    RepHubFrame.frame:RegisterEvent("CVAR_UPDATE")
     RepHubFrame.frame:SetScript(
         "OnEvent",
         function(self, event, ...)
-            pendingUpdateFactionEvent = true
+            if event == "UPDATE_FACTION" then
+                pendingUpdateFactionEvent = true
+            elseif event == "CVAR_UPDATE" then
+                local cvarName = select(1, ...)
+                if cvarName == "reputationsCollapsed" then -- Prevent UPDATE_FACTION event from triggering on reputation list manual collapse/expand
+                    pendingUpdateFactionEvent = false
+                end
+            end
         end
     )
     C_Timer.NewTicker(
@@ -326,7 +334,7 @@ function RepHub:CreateRepHubFrame()
                 RepHub:ShowFactionDetailFrame(factionName)
             end
         end,
-    });
+    })
 
     RepHubFrame:AddChild(RepHubTableGroup)
 
