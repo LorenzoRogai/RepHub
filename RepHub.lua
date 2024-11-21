@@ -206,9 +206,9 @@ function RepHub:HighestStandingSort(libSt, rowa, rowb, column)
     end
 
     if libSt.cols[column].sort == SORT_ASC then
-        return cellaValue < cellbValue;
+        return cellaValue < cellbValue
     else
-        return cellaValue > cellbValue;
+        return cellaValue > cellbValue
     end
 end
 
@@ -229,6 +229,30 @@ function RepHub:GetReputationLabel(standing)
     end
     
     return reputationLabelResult
+end
+
+function RepHub:GetRepHubTableData()
+    local dataArr = {}
+
+    table.foreach(
+        self.db.global.reputationList,
+        function(factionID, factionData)
+            if not factionData.isHeader or (factionData.isHeader and factionData.isHeaderWithRep) then
+                local highestStandingText, highestStandingCharacterNameText, charCountText = "", "", ""
+                if factionData.isAccountWide then
+                    highestStandingText, charCountText = "--", "--"
+                    highestStandingCharacterNameText = "Account-wide"
+                else
+                    highestStandingText, highestStandingCharacterNameText = RepHub:FindHighestStanding(factionData.standings)
+                    highestStandingText = highestStandingText .. " (" .. RepHub:GetReputationLabel(highestStandingText) .. ")"
+                    charCountText = RepHub:GetTableLength(factionData.standings)
+                end
+                table.insert(dataArr, {factionData.name, factionData.currentGroup, highestStandingText, highestStandingCharacterNameText, charCountText})
+            end
+        end
+    )
+
+    return dataArr
 end
 
 -- GUI
@@ -259,6 +283,7 @@ function RepHub:CreateRepHubFrame()
         function()
             if pendingUpdateFactionEvent then
                 RepHub:RefreshReputationGlobalDB()
+                RepHubTable:SetData(RepHub:GetRepHubTableData(), true)
                 pendingUpdateFactionEvent = false
             end
         end
@@ -298,25 +323,6 @@ function RepHub:CreateRepHubFrame()
         { ["name"] = "H. S. Char Name", ["width"] = 155, },
         { ["name"] = "Char Count", ["width"] = 65, },
     }
-    local dataArr = {}
-
-    table.foreach(
-        self.db.global.reputationList,
-        function(factionID, factionData)
-            if not factionData.isHeader or (factionData.isHeader and factionData.isHeaderWithRep) then
-                local highestStandingText, highestStandingCharacterNameText, charCountText = "", "", ""
-                if factionData.isAccountWide then
-                    highestStandingText, charCountText = "--", "--"
-                    highestStandingCharacterNameText = "Account-wide"
-                else
-                    highestStandingText, highestStandingCharacterNameText = RepHub:FindHighestStanding(factionData.standings)
-                    highestStandingText = highestStandingText .. " (" .. RepHub:GetReputationLabel(highestStandingText) .. ")"
-                    charCountText = RepHub:GetTableLength(factionData.standings)
-                end
-                table.insert(dataArr, {factionData.name, factionData.currentGroup, highestStandingText, highestStandingCharacterNameText, charCountText})
-            end
-        end
-    )
 
     local RepHubTableGroup = AceGUI:Create("SimpleGroup")
     RepHubTableGroup:SetFullWidth(true)
@@ -325,7 +331,7 @@ function RepHub:CreateRepHubFrame()
 
     local ScrollingTable = LibStub("ScrollingTable")
     RepHubTable = ScrollingTable:CreateST(columnsArr, 23, nil, nil, RepHubTableGroup.frame)
-    RepHubTable:SetData(dataArr, true)
+    RepHubTable:SetData(RepHub:GetRepHubTableData(), true)
     RepHubTable:RegisterEvents({
         ["OnClick"] = function (rowFrame, cellFrame, data, cols, row, realrow, column, table, button, ...)
             if realrow then
