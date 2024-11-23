@@ -20,7 +20,8 @@ local RepHubFrameShown,
         SORT_ASC,
         SORT_DESC,
         pendingUpdateFactionEvent,
-        updateFactionEventInterval = false, nil, nil, nil, nil, 1, 2, false, 10
+        updateFactionEventInterval,
+        reputationListCollapsedState = false, nil, nil, nil, nil, 1, 2, false, 10, nil
 
 local reputationLabels = {
     [-42000] = "Hated",
@@ -101,9 +102,10 @@ function RepHub:RefreshReputationGlobalDB()
         table.insert(self.db.global.characterNames, characterName)
     end
 
+    RepHub:HandleReputationListCollapsedState()
+
     local currentGroup = nil
 
-    C_Reputation.ExpandAllFactionHeaders()
     local numFactions = C_Reputation.GetNumFactions()
     local factionIndex = 1
     while (factionIndex <= numFactions) do
@@ -111,6 +113,11 @@ function RepHub:RefreshReputationGlobalDB()
         if factionData.isHeader then
             if not factionData.isHeaderWithRep then
                 currentGroup = factionData.name
+            end
+
+            if factionData.isCollapsed then -- C_Reputation.ExpandAllFactionHeaders() doesn't work correctly, use this workaround instead
+                C_Reputation.ExpandFactionHeader(factionIndex)
+                numFactions = C_Reputation.GetNumFactions()
             end
         end
 
@@ -129,6 +136,8 @@ function RepHub:RefreshReputationGlobalDB()
 
         factionIndex = factionIndex + 1
     end
+
+    RepHub:HandleReputationListCollapsedState(true)
 end
 
 function RepHub:ResetDB()
@@ -253,6 +262,27 @@ function RepHub:GetRepHubTableData()
     )
 
     return dataArr
+end
+
+function RepHub:HandleReputationListCollapsedState(restoreState)
+    if not restoreState then
+        reputationListCollapsedState = {}
+    end
+
+    local numFactions = C_Reputation.GetNumFactions()
+    local factionIndex = 1
+    while (factionIndex <= numFactions) do
+        local factionData = C_Reputation.GetFactionDataByIndex(factionIndex)
+        if factionData.isHeader then
+            if not restoreState and factionData.isCollapsed then
+                reputationListCollapsedState[factionData.factionID] = true
+            elseif restoreState and reputationListCollapsedState[factionData.factionID] then
+                C_Reputation.CollapseFactionHeader(factionIndex)
+            end
+        end
+
+        factionIndex = factionIndex + 1
+    end
 end
 
 -- GUI
