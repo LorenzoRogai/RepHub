@@ -34,6 +34,47 @@ local reputationLabels = {
     [42000] = "Exalted",
 }
 
+local reputationLabelsColors = {
+    ["Hated"] = { r = 0.67, g = 0.11, b = 0.11 },
+    ["Hostile"] = { r = 0.67, g = 0, b = 0 },
+    ["Unfriendly"] = { r = 0.67, g = 0.29, b = 0.09 },
+    ["Neutral"] = { r = 0.67, g = 0.67, b = 0 },
+    ["Friendly"] = { r = 0, g = 0.67, b = 0 },
+    ["Honored"] = { r = 0, g = 0.67, b = 0.36 },
+    ["Revered"] = { r = 0, g = 0.67, b = 0.54 },
+    ["Exalted"] = { r = 0, g = 0.67, b = 0.67 },
+}
+
+local classesColor = {
+    ["DEATHKNIGHT"] = { r = 0.77, g = 0.12, b = 0.23 },
+    ["DEMONHUNTER"] = { r = 0.64, g = 0.19, b = 0.79 },
+    ["DRUID"] = { r = 1.00, g = 0.49, b = 0.04 },
+    ["HUNTER"] = { r = 0.67, g = 0.83, b = 0.45 },
+    ["MAGE"] = { r = 0.41, g = 0.80, b = 0.94 },
+    ["MONK"] = { r = 0.00, g = 1.00, b = 0.59 },
+    ["PALADIN"] = { r = 0.96, g = 0.55, b = 0.73 },
+    ["PRIEST"] = { r = 1.00, g = 1.00, b = 1.00 },
+    ["ROGUE"] = { r = 1.00, g = 0.96, b = 0.41 },
+    ["SHAMAN"] = { r = 0.00, g = 0.44, b = 0.87 },
+    ["WARLOCK"] = { r = 0.58, g = 0.51, b = 0.79 },
+    ["WARRIOR"] = { r = 0.78, g = 0.61, b = 0.43 },
+    ["EVOKER"] = { r = 0.20, g = 0.58, b = 0.50 },
+}
+
+local groupsIcons = {
+    ["Classic"] = "Interface\\Addons\\RepHub\\Icons\\Classic",
+    ["The Burning Crusade"] = "Interface\\Addons\\RepHub\\Icons\\TheBurningCrusade",
+    ["Wrath of the Lich King"] = "Interface\\Addons\\RepHub\\Icons\\WrathOfTheLichKing",
+    ["Cataclysm"] = "Interface\\Addons\\RepHub\\Icons\\Cataclysm",
+    ["Mists of Pandaria"] = "Interface\\Addons\\RepHub\\Icons\\MistsOfPandaria",
+    ["Warlords of Draenor"] = "Interface\\Addons\\RepHub\\Icons\\WarlordsOfDraenor",
+    ["Legion"] = "Interface\\Addons\\RepHub\\Icons\\Legion",
+    ["Battle for Azeroth"] = "Interface\\Addons\\RepHub\\Icons\\BattleForAzeroth",
+    ["Shadowlands"] = "Interface\\Addons\\RepHub\\Icons\\Shadowlands",
+    ["Dragonflight"] = "Interface\\Addons\\RepHub\\Icons\\Dragonflight",
+    ["The War Within"] = "Interface\\Addons\\RepHub\\Icons\\TheWarWithin"
+}
+
 function RepHub:OnInitialize()
     self.db = LibStub("AceDB-3.0"):New("RepHubDB", {
         profile = {
@@ -43,6 +84,7 @@ function RepHub:OnInitialize()
         },
         global = {
             characterNames = {},
+            characterClasses = {},
             reputationList = {},
         },
     })
@@ -101,6 +143,9 @@ function RepHub:RefreshReputationGlobalDB()
     if not tContains(self.db.global.characterNames, characterName) then
         table.insert(self.db.global.characterNames, characterName)
     end
+
+    local characterClass = select(2, UnitClass("player"))
+    self.db.global.characterClasses[characterName] = characterClass
 
     RepHub:HandleReputationListCollapsedState()
 
@@ -175,8 +220,8 @@ end
 
 function RepHub:FilterFunction(row)
     local showRow = false
-    for _, columnValue in pairs(row) do
-        if string.find(string.lower(columnValue), string.lower(filterValue)) then
+    for _, columnValue in pairs(row.cols) do
+        if string.find(string.lower(columnValue.value), string.lower(filterValue)) then
             showRow = true
             break
         end
@@ -198,7 +243,7 @@ function RepHub:GetFactionDataByName(factionName)
 end
 
 function RepHub:HighestStandingSort(libSt, rowa, rowb, column)
-    local cellaValue, cellbValue = libSt:GetCell(rowa, column), libSt:GetCell(rowb, column)
+    local cellaValue, cellbValue = libSt:GetCell(rowa, column).value, libSt:GetCell(rowb, column).value
 
     local cellaBracketPosition = cellaValue:find("(", 1, true)
     if cellaBracketPosition then
@@ -247,16 +292,43 @@ function RepHub:GetRepHubTableData()
         self.db.global.reputationList,
         function(factionID, factionData)
             if not factionData.isHeader or (factionData.isHeader and factionData.isHeaderWithRep) then
-                local highestStandingText, highestStandingCharacterNameText, charCountText = "", "", ""
+                local highestStandingText,
+                    highestStandingTextColor,
+                    highestStandingCharacterNameText,
+                    highestStandingCharacterNameTextColor,
+                    charCountText = nil, nil, nil, nil, nil
                 if factionData.isAccountWide then
                     highestStandingText, charCountText = "--", "--"
                     highestStandingCharacterNameText = "Account-wide"
+                    highestStandingTextColor = { r = 1.0, g = 1.0, b = 1.0 }
+                    highestStandingCharacterNameTextColor = { r = 1.0, g = 1.0, b = 1.0 }
                 else
                     highestStandingText, highestStandingCharacterNameText = RepHub:FindHighestStanding(factionData.standings)
-                    highestStandingText = highestStandingText .. " (" .. RepHub:GetReputationLabel(highestStandingText) .. ")"
+                    local reputationLabel = RepHub:GetReputationLabel(highestStandingText)
+                    highestStandingText = highestStandingText .. " (" .. reputationLabel .. ")"
                     charCountText = RepHub:GetTableLength(factionData.standings)
+                    highestStandingTextColor = reputationLabelsColors[reputationLabel]
+                    highestStandingCharacterNameTextColor = classesColor[self.db.global.characterClasses[highestStandingCharacterNameText]]
                 end
-                table.insert(dataArr, {factionData.name, factionData.currentGroup, highestStandingText, highestStandingCharacterNameText, charCountText})
+
+                local currentGroupText = factionData.currentGroup
+                local currentGroupIcon = groupsIcons[currentGroupText] or nil
+
+                if currentGroupIcon then
+                    local currentGroupIcon = string.format("%s:%d", currentGroupIcon, 0)
+                    local currentGroupIcon = string.format("\124T%s\124t", currentGroupIcon)
+                    currentGroupText = currentGroupIcon .. " " .. currentGroupText
+                end
+
+                table.insert(dataArr, {
+                    ["cols"] = {
+                        { ["value"] = factionData.name },
+                        { ["value"] = currentGroupText },
+                        { ["value"] = highestStandingText, ["color"] = highestStandingTextColor },
+                        { ["value"] = highestStandingCharacterNameText, ["color"] = highestStandingCharacterNameTextColor },
+                        { ["value"] = charCountText }
+                    }
+                })
             end
         end
     )
@@ -313,7 +385,7 @@ function RepHub:CreateRepHubFrame()
         function()
             if pendingUpdateFactionEvent then
                 RepHub:RefreshReputationGlobalDB()
-                RepHubTable:SetData(RepHub:GetRepHubTableData(), true)
+                RepHubTable:SetData(RepHub:GetRepHubTableData())
                 pendingUpdateFactionEvent = false
             end
         end
@@ -361,12 +433,12 @@ function RepHub:CreateRepHubFrame()
 
     local ScrollingTable = LibStub("ScrollingTable")
     RepHubTable = ScrollingTable:CreateST(columnsArr, 23, nil, nil, RepHubTableGroup.frame)
-    RepHubTable:SetData(RepHub:GetRepHubTableData(), true)
+    RepHubTable:SetData(RepHub:GetRepHubTableData())
     RepHubTable:RegisterEvents({
         ["OnClick"] = function (rowFrame, cellFrame, data, cols, row, realrow, column, table, button, ...)
             if realrow then
                 local rowdata = RepHubTable:GetRow(realrow)
-                local factionName = RepHubTable:GetCell(rowdata, 1)
+                local factionName = RepHubTable:GetCell(rowdata, 1).value
                 RepHub:ShowFactionDetailFrame(factionName)
             end
         end,
