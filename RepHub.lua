@@ -296,7 +296,7 @@ function RepHub:GetRepHubTableData()
                     highestStandingTextColor,
                     highestStandingCharacterNameText,
                     highestStandingCharacterNameTextColor,
-                    charCountText = nil, nil, nil, nil, nil
+                    charCountText = "", nil, "", nil, ""
                 if factionData.isAccountWide then
                     highestStandingText, charCountText = "--", "--"
                     highestStandingCharacterNameText = "Account-wide"
@@ -315,8 +315,7 @@ function RepHub:GetRepHubTableData()
                 local currentGroupIcon = groupsIcons[currentGroupText] or nil
 
                 if currentGroupIcon then
-                    local currentGroupIcon = string.format("%s:%d", currentGroupIcon, 0)
-                    local currentGroupIcon = string.format("\124T%s\124t", currentGroupIcon)
+                    local currentGroupIcon = string.format("\124T%s:%d\124t", currentGroupIcon, 25)
                     currentGroupText = currentGroupIcon .. " " .. currentGroupText
                 end
 
