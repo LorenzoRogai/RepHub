@@ -119,6 +119,7 @@ function RepHub:CheckDB()
         needResetFrame:SetCallback("OnClose", function(widget) AceGUI:Release(widget) end)
         needResetFrame:SetWidth(250)
         needResetFrame:SetHeight(175)
+        needResetFrame:EnableResize(false) -- We also need this to remove the resize icon in the bottom right corner
         needResetFrame.frame:SetMovable(false)
         needResetFrame.frame:SetResizable(false)
 
@@ -362,6 +363,7 @@ function RepHub:CreateRepHubFrame()
     RepHubFrame = AceGUI:Create("Frame")
     RepHubFrame:SetTitle("RepHub")
     RepHubFrame:SetStatusText("RepHub is a simple account-wide reputation tracker")
+    RepHubFrame:EnableResize(false) -- We also need this to remove the resize icon in the bottom right corner
     RepHubFrame.frame:SetMovable(true)
     RepHubFrame.frame:SetResizable(false)
     RepHubFrame.frame:RegisterEvent("UPDATE_FACTION")
@@ -473,6 +475,7 @@ function RepHub:ShowFactionDetailFrame(factionName)
     factionDetailFrame:SetWidth(250)
     factionDetailFrame:SetHeight(175)
     factionDetailFrame:SetPoint("TOPLEFT", UIParent, "TOPLEFT", 100, -100)
+    factionDetailFrame:EnableResize(false) -- We also need this to remove the resize icon in the bottom right corner
     factionDetailFrame.frame:SetMovable(false)
     factionDetailFrame.frame:SetResizable(false)
 
