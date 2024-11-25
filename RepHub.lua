@@ -494,11 +494,17 @@ function RepHub:ShowFactionDetailFrame(factionName)
             factionDetailText = factionDetailText .. sortedStanding.characterName .. ": " .. sortedStanding.standing .. " (" .. RepHub:GetReputationLabel(sortedStanding.standing) .. ")\n"
         end
     )
+    
+    local factionDetailScrollFrame = AceGUI:Create("ScrollFrame")
+    factionDetailScrollFrame:SetFullWidth(true)
+    factionDetailScrollFrame:SetFullHeight(true)
 
     local factionDetailLabel = AceGUI:Create("Label")
     factionDetailLabel:SetFullWidth(true)
     factionDetailLabel:SetText(factionDetailText)
-    factionDetailFrame:AddChild(factionDetailLabel)
+    factionDetailScrollFrame:AddChild(factionDetailLabel)
+    
+    factionDetailFrame:AddChild(factionDetailScrollFrame)
 
     factionDetailFrame:Show()
     RepHubFactionDetailFrameShown = true
