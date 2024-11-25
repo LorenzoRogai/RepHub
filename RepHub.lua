@@ -448,6 +448,11 @@ function RepHub:CreateRepHubFrame()
     RepHubFrame:AddChild(RepHubTableGroup)
 
     RepHubFrame.frame:Hide()
+
+    _G["RepHubFrame"] = RepHubFrame.frame
+    if not tContains(UISpecialFrames, "RepHubFrame") then
+        table.insert(UISpecialFrames, "RepHubFrame")
+    end
 end
 
 function RepHub:ShowFactionDetailFrame(factionName)
@@ -465,6 +470,7 @@ function RepHub:ShowFactionDetailFrame(factionName)
     local factionData = RepHub:GetFactionDataByName(factionName)
 
     if factionData.isAccountWide then
+        print("RepHub: No details available for account-wide reputations")
         return
     end
 
@@ -474,6 +480,7 @@ function RepHub:ShowFactionDetailFrame(factionName)
     RepHubFactionDetailFrame:SetCallback(
         "OnClose",
         function(widget)
+            RepHubFactionDetailFrame = nil
             AceGUI:Release(widget)
         end
     )
@@ -515,6 +522,11 @@ function RepHub:ShowFactionDetailFrame(factionName)
     RepHubFactionDetailFrame:AddChild(factionDetailScrollFrame)
 
     RepHubFactionDetailFrame:Show()
+
+    _G["RepHubFactionDetailFrame"] = RepHubFactionDetailFrame.frame
+    if not tContains(UISpecialFrames, "RepHubFactionDetailFrame") then
+        table.insert(UISpecialFrames, "RepHubFactionDetailFrame")
+    end
 end
 
 function RepHub:ShowRepHubFrame()
