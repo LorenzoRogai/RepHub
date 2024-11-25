@@ -14,7 +14,7 @@ local LibDataBroker = LibStub("LibDataBroker-1.1"):NewDataObject("RepHub", {
 local LibDBIcon = LibStub("LibDBIcon-1.0")
 local RepHubFrameShown,
         RepHubFrame,
-        RepHubFactionDetailFrameShown,
+        RepHubFactionDetailFrame,
         RepHubTable,
         filterValue,
         SORT_ASC,
@@ -451,8 +451,14 @@ function RepHub:CreateRepHubFrame()
 end
 
 function RepHub:ShowFactionDetailFrame(factionName)
-    if RepHubFactionDetailFrameShown then
-        print("RepHub: Close the current faction detail first")
+    local currentFactionName = nil
+    if RepHubFactionDetailFrame then
+        currentFactionName = RepHubFactionDetailFrame.titletext:GetText()
+        RepHubFactionDetailFrame:Hide()
+    end
+
+    if currentFactionName == factionName then
+        RepHubFactionDetailFrame = nil
         return
     end
 
@@ -462,22 +468,21 @@ function RepHub:ShowFactionDetailFrame(factionName)
         return
     end
 
-    local factionDetailFrame = AceGUI:Create("Frame")
-    factionDetailFrame:SetTitle(factionName)
-    factionDetailFrame:SetStatusText("Char Count: " .. RepHub:GetTableLength(factionData.standings))
-    factionDetailFrame:SetCallback(
+    RepHubFactionDetailFrame = AceGUI:Create("Frame")
+    RepHubFactionDetailFrame:SetTitle(factionName)
+    RepHubFactionDetailFrame:SetStatusText("Char Count: " .. RepHub:GetTableLength(factionData.standings))
+    RepHubFactionDetailFrame:SetCallback(
         "OnClose",
         function(widget)
             AceGUI:Release(widget)
-            RepHubFactionDetailFrameShown = false
         end
     )
-    factionDetailFrame:SetWidth(250)
-    factionDetailFrame:SetHeight(175)
-    factionDetailFrame:SetPoint("TOPLEFT", UIParent, "TOPLEFT", 100, -100)
-    factionDetailFrame:EnableResize(false) -- We also need this to remove the resize icon in the bottom right corner
-    factionDetailFrame.frame:SetMovable(false)
-    factionDetailFrame.frame:SetResizable(false)
+    RepHubFactionDetailFrame:SetWidth(250)
+    RepHubFactionDetailFrame:SetHeight(175)
+    RepHubFactionDetailFrame:SetPoint("TOPLEFT", UIParent, "TOPLEFT", 100, -100)
+    RepHubFactionDetailFrame:EnableResize(false) -- We also need this to remove the resize icon in the bottom right corner
+    RepHubFactionDetailFrame.frame:SetMovable(false)
+    RepHubFactionDetailFrame.frame:SetResizable(false)
 
     local factionDetailText = ""
 
@@ -507,10 +512,9 @@ function RepHub:ShowFactionDetailFrame(factionName)
     factionDetailLabel:SetText(factionDetailText)
     factionDetailScrollFrame:AddChild(factionDetailLabel)
     
-    factionDetailFrame:AddChild(factionDetailScrollFrame)
+    RepHubFactionDetailFrame:AddChild(factionDetailScrollFrame)
 
-    factionDetailFrame:Show()
-    RepHubFactionDetailFrameShown = true
+    RepHubFactionDetailFrame:Show()
 end
 
 function RepHub:ShowRepHubFrame()
