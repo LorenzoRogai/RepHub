@@ -157,7 +157,7 @@ function RepHub:RefreshReputationGlobalDB()
     while (factionIndex <= numFactions) do
         local factionData = C_Reputation.GetFactionDataByIndex(factionIndex)
         if factionData.isHeader then
-            if not factionData.isHeaderWithRep then
+            if not factionData.isHeaderWithRep and not factionData.isChild then
                 currentGroup = factionData.name
             end
 
