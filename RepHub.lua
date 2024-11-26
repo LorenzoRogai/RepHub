@@ -178,7 +178,16 @@ function RepHub:RefreshReputationGlobalDB()
             }
         end
 
-        self.db.global.reputationList[factionData.factionID].standings[characterName] = factionData.currentStanding
+        local currentStanding = factionData.currentStanding
+
+        if not factionData.isAccountWide then
+            local friendshipReputationData = C_GossipInfo.GetFriendshipReputation(factionData.factionID)
+            if friendshipReputationData and friendshipReputationData.friendshipFactionID ~= 0 then
+                currentStanding = friendshipReputationData.standing
+            end
+        end
+
+        self.db.global.reputationList[factionData.factionID].standings[characterName] = currentStanding
 
         factionIndex = factionIndex + 1
     end
