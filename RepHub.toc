@@ -10,4 +10,5 @@
 ## X-Wago-ID: E6gL2OK1
 
 Libs.xml
+FactionsAdditionalInfo.lua
 RepHub.lua

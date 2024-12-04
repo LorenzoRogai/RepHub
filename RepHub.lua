@@ -366,6 +366,20 @@ function RepHub:HandleReputationListCollapsedState(restoreState)
     end
 end
 
+function RepHub:GetFactionAdditionalInfo(factionName)
+    local factionsAdditionalInfo = _G["RepHubFactionsAdditionalInfo"]
+
+    local factionAdditionalInfo = nil
+    for i = 1, #factionsAdditionalInfo do
+        if factionsAdditionalInfo[i].name == factionName then
+            factionAdditionalInfo = factionsAdditionalInfo[i]
+            break
+        end
+    end
+
+    return factionAdditionalInfo
+end
+
 -- GUI
 
 function RepHub:CreateRepHubFrame()
@@ -493,14 +507,28 @@ function RepHub:ShowFactionDetailFrame(factionName)
             AceGUI:Release(widget)
         end
     )
-    RepHubFactionDetailFrame:SetWidth(250)
-    RepHubFactionDetailFrame:SetHeight(175)
+    RepHubFactionDetailFrame:SetWidth(300)
+    RepHubFactionDetailFrame:SetHeight(200)
     RepHubFactionDetailFrame:SetPoint("TOPLEFT", UIParent, "TOPLEFT", 100, -100)
     RepHubFactionDetailFrame:EnableResize(false) -- We also need this to remove the resize icon in the bottom right corner
     RepHubFactionDetailFrame.frame:SetMovable(false)
     RepHubFactionDetailFrame.frame:SetResizable(false)
 
     local factionDetailText = ""
+
+    local factionAdditionalInfo = RepHub:GetFactionAdditionalInfo(factionName)
+
+    if factionAdditionalInfo then
+        factionDetailText = "Zones: " .. table.concat(factionAdditionalInfo.zones, ", ") .. "\n"
+        factionDetailText = factionDetailText .. "Side: " .. factionAdditionalInfo.side .. "\n"
+        factionDetailText = factionDetailText .. "Category: " .. factionAdditionalInfo.category .. "\n"
+        factionDetailText = factionDetailText .. "Quartermaster Location: " .. factionAdditionalInfo.quartermaster_location .. "\n"
+        factionDetailText = factionDetailText .. "How to Farm:\n"
+        for i = 1, #factionAdditionalInfo.farming_methods do
+            factionDetailText = factionDetailText .. " - " .. factionAdditionalInfo.farming_methods[i] .. "\n"
+        end
+        factionDetailText = factionDetailText .. "\n--------------\n\n"
+    end
 
     local sortedStandings = {}
     table.foreach(
