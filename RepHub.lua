@@ -276,6 +276,26 @@ function RepHub:HighestStandingSort(libSt, rowa, rowb, column)
     end
 end
 
+function RepHub:IconColumnSort(libSt, rowa, rowb, column)
+    local cellaValue, cellbValue = libSt:GetCell(rowa, column).value, libSt:GetCell(rowb, column).value
+
+    local cellaIconPosition = cellaValue:find("\124t ", 1, true)
+    if cellaIconPosition then
+        cellaValue = cellaValue:sub(cellaIconPosition + 3)
+    end
+
+    local cellbIconPosition = cellbValue:find("\124t ", 1, true)
+    if cellbIconPosition then
+        cellbValue = cellbValue:sub(cellbIconPosition + 3)
+    end
+
+    if libSt.cols[column].sort == SORT_ASC then
+        return cellaValue < cellbValue
+    else
+        return cellaValue > cellbValue
+    end
+end
+
 function RepHub:GetReputationLabel(standing)
     local reputationLabelResult = nil
     local sortedKeys = {}
@@ -501,8 +521,16 @@ function RepHub:CreateRepHubFrame()
 
     -- Table
     local columnsArr = {
-        { ["name"] = "Reputation Name", ["width"] = 155, },
-        { ["name"] = "Group", ["width"] = 140, },
+        {
+            ["name"] = "Reputation Name", ["width"] = 155, ["comparesort"] = function (libSt, rowa, rowb, column)
+                return RepHub:IconColumnSort(libSt, rowa, rowb, column)
+            end
+        },
+        {
+            ["name"] = "Group", ["width"] = 140, ["comparesort"] = function (libSt, rowa, rowb, column)
+                return RepHub:IconColumnSort(libSt, rowa, rowb, column)
+            end
+        },
         {
             ["name"] = "Highest Standing", ["width"] = 105, ["sort"] = "asc", ["comparesort"] = function (libSt, rowa, rowb, column)
                 return RepHub:HighestStandingSort(libSt, rowa, rowb, column)
