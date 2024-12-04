@@ -321,17 +321,32 @@ function RepHub:GetRepHubTableData()
                     highestStandingCharacterNameTextColor = classesColor[self.db.global.characterClasses[highestStandingCharacterNameText]]
                 end
 
+                local factionAdditionalInfo = RepHub:GetFactionAdditionalInfo(factionData.name)
+                local factionNameText = factionData.name
+                if factionAdditionalInfo then
+                    local sideIcon = ""
+                    if factionAdditionalInfo.side == "Alliance" then
+                        sideIcon = "Interface\\Addons\\RepHub\\Icons\\Alliance"
+                    elseif factionAdditionalInfo.side == "Horde" then
+                        sideIcon = "Interface\\Addons\\RepHub\\Icons\\Horde"
+                    end
+                    if sideIcon ~= "" then
+                        sideIcon = string.format("\124T%s:%d\124t", sideIcon, 15)
+                        factionNameText = sideIcon .. " " .. factionNameText
+                    end
+                end
+
                 local currentGroupText = factionData.currentGroup
                 local currentGroupIcon = groupsIcons[currentGroupText] or nil
 
                 if currentGroupIcon then
-                    local currentGroupIcon = string.format("\124T%s:%d\124t", currentGroupIcon, 25)
+                    currentGroupIcon = string.format("\124T%s:%d\124t", currentGroupIcon, 25)
                     currentGroupText = currentGroupIcon .. " " .. currentGroupText
                 end
 
                 table.insert(dataArr, {
                     ["cols"] = {
-                        { ["value"] = factionData.name },
+                        { ["value"] = factionNameText },
                         { ["value"] = currentGroupText },
                         { ["value"] = highestStandingText, ["color"] = highestStandingTextColor },
                         { ["value"] = highestStandingCharacterNameText, ["color"] = highestStandingCharacterNameTextColor },
