@@ -231,7 +231,7 @@ end
 function RepHub:FilterFunction(row)
     local showRow = false
     for _, columnValue in pairs(row.cols) do
-        if string.find(string.lower(columnValue.value), string.lower(filterValue)) then
+        if string.find(string.lower(columnValue.value), string.lower(filterValue), 1, true) then
             showRow = true
             break
         end
@@ -436,13 +436,19 @@ function RepHub:CreateRepHubFrame()
         end
     )
     
+    -- Stats
     local StatsLabel = AceGUI:Create("Label")
     StatsLabel:SetFullWidth(true)
     StatsLabel:SetText("Total reputations: " .. RepHub:GetTableLength(self.db.global.reputationList)  .. " | Total characters: " .. #self.db.global.characterNames)
     RepHubFrame:AddChild(StatsLabel)
 
+    -- Search
+    local SearchGroup = AceGUI:Create("SimpleGroup")
+    SearchGroup:SetLayout("Flow")
+    SearchGroup:SetFullWidth(true)
+
     local SearchBox = AceGUI:Create("EditBox")
-    SearchBox:SetFullWidth(true)
+    SearchBox:SetWidth(465)
     SearchBox:SetLabel("Search:")
     SearchBox:SetCallback(
         "OnEnterPressed",
@@ -451,8 +457,49 @@ function RepHub:CreateRepHubFrame()
             RepHubTable:SetFilter(RepHub.FilterFunction)
         end
     )
-    RepHubFrame:AddChild(SearchBox)
+    SearchGroup:AddChild(SearchBox)
 
+    local filterDropdownValues = {All = "All"}
+    local filterDropdownOrder = {"All"}
+
+    for reputationValue, reputationLabel in pairs(reputationLabels) do
+        filterDropdownValues[reputationLabel] = "Reputation Level: " .. reputationLabel
+        table.insert(filterDropdownOrder, reputationLabel)
+    end
+
+    table.foreach(
+        self.db.global.reputationList,
+        function(factionID, factionData)
+            filterDropdownValues[factionData.currentGroup] = "Group: " .. factionData.currentGroup
+            if not tContains(filterDropdownOrder, factionData.currentGroup) then
+                table.insert(filterDropdownOrder, factionData.currentGroup)
+            end
+        end
+    )
+
+    for _, characterName in pairs(self.db.global.characterNames) do
+        filterDropdownValues[characterName] = "H.S. Char Name: " .. characterName
+        table.insert(filterDropdownOrder, characterName)
+    end
+
+    local filterDropdown = AceGUI:Create("Dropdown")
+    filterDropdown:SetList(filterDropdownValues, filterDropdownOrder)
+    filterDropdown:SetLabel("Filter")
+    filterDropdown:SetValue(filterDropdownValues["All"])
+    filterDropdown:SetCallback(
+        "OnValueChanged",
+        function(widget, event, value)
+            if value == "All" then
+                value = ""
+            end
+            filterValue = value
+            RepHubTable:SetFilter(RepHub.FilterFunction)
+        end
+    )
+    SearchGroup:AddChild(filterDropdown)
+    RepHubFrame:AddChild(SearchGroup)
+
+    -- Table
     local columnsArr = {
         { ["name"] = "Reputation Name", ["width"] = 155, },
         { ["name"] = "Group", ["width"] = 140, },
