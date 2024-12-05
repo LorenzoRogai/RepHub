@@ -557,8 +557,7 @@ function RepHub:CreateRepHubFrame()
         ["OnClick"] = function (rowFrame, cellFrame, data, cols, row, realrow, column, table, button, ...)
             if realrow then
                 local rowdata = RepHubTable:GetRow(realrow)
-                local factionName = RepHubTable:GetCell(rowdata, 1).value
-                factionName = RepHub:StripIconFromText(factionName)
+                local factionName = RepHub:StripIconFromText(RepHubTable:GetCell(rowdata, 1).value)
                 RepHub:ShowFactionDetailFrame(factionName)
             end
         end,
