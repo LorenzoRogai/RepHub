@@ -633,7 +633,7 @@ function RepHub:ShowFactionDetailFrame(factionName)
     local factionAdditionalInfo = RepHub:GetFactionAdditionalInfo(factionName)
 
     if factionAdditionalInfo then
-        factionDetailText = factionDetailText .. "\n" .. RepHub:GetColoredText(string.rep("-", 60), {r = 0.5, g = 0.5, b = 0.5}) .. "\n\n"
+        factionDetailText = factionDetailText .. "\n"
         factionDetailText = factionDetailText .. RepHub:GetColoredText("Zones:", {r = 1, g = 0.84, b = 0}) .. " " .. table.concat(factionAdditionalInfo.zones, ", ") .. "\n"
         factionDetailText = factionDetailText .. RepHub:GetColoredText("Side:", {r = 1, g = 0.84, b = 0}) .. " " .. factionAdditionalInfo.side .. "\n"
         factionDetailText = factionDetailText .. RepHub:GetColoredText("Category:", {r = 1, g = 0.84, b = 0}) .. " " .. factionAdditionalInfo.category .. "\n"
