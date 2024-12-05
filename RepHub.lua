@@ -296,6 +296,10 @@ function RepHub:IconColumnSort(libSt, rowa, rowb, column)
     end
 end
 
+function RepHub:GetColoredText(text, color)
+    return string.format("\124cFF%02X%02X%02X%s\124r", color.r * 255, color.g * 255, color.b * 255, text)
+end
+
 function RepHub:GetReputationLabel(standing)
     local reputationLabelResult = nil
     local sortedKeys = {}
@@ -619,19 +623,22 @@ function RepHub:ShowFactionDetailFrame(factionName)
     table.foreach(
         sortedStandings,
         function(_, sortedStanding)
-            factionDetailText = factionDetailText .. sortedStanding.characterName .. ": " .. sortedStanding.standing .. " (" .. RepHub:GetReputationLabel(sortedStanding.standing) .. ")\n"
+            local sortedCharacterNameText = RepHub:GetColoredText(sortedStanding.characterName, classesColor[self.db.global.characterClasses[sortedStanding.characterName]])
+            local reputationLabel = RepHub:GetReputationLabel(sortedStanding.standing)
+            local sortedStandingText = RepHub:GetColoredText(sortedStanding.standing .. " (" .. reputationLabel .. ")", reputationLabelsColors[reputationLabel])
+            factionDetailText = factionDetailText .. sortedCharacterNameText .. ": " .. sortedStandingText .. "\n"
         end
     )
 
     local factionAdditionalInfo = RepHub:GetFactionAdditionalInfo(factionName)
 
     if factionAdditionalInfo then
-        factionDetailText = factionDetailText .. "\n--------------\n\n"
-        factionDetailText = factionDetailText .. "Zones: " .. table.concat(factionAdditionalInfo.zones, ", ") .. "\n"
-        factionDetailText = factionDetailText .. "Side: " .. factionAdditionalInfo.side .. "\n"
-        factionDetailText = factionDetailText .. "Category: " .. factionAdditionalInfo.category .. "\n"
-        factionDetailText = factionDetailText .. "Quartermaster Location: " .. factionAdditionalInfo.quartermaster_location .. "\n"
-        factionDetailText = factionDetailText .. "How to Farm:\n"
+        factionDetailText = factionDetailText .. "\n" .. RepHub:GetColoredText(string.rep("-", 60), {r = 0.5, g = 0.5, b = 0.5}) .. "\n\n"
+        factionDetailText = factionDetailText .. RepHub:GetColoredText("Zones:", {r = 1, g = 0.84, b = 0}) .. " " .. table.concat(factionAdditionalInfo.zones, ", ") .. "\n"
+        factionDetailText = factionDetailText .. RepHub:GetColoredText("Side:", {r = 1, g = 0.84, b = 0}) .. " " .. factionAdditionalInfo.side .. "\n"
+        factionDetailText = factionDetailText .. RepHub:GetColoredText("Category:", {r = 1, g = 0.84, b = 0}) .. " " .. factionAdditionalInfo.category .. "\n"
+        factionDetailText = factionDetailText .. RepHub:GetColoredText("Quartermaster Location:", {r = 1, g = 0.84, b = 0}) .. " " .. factionAdditionalInfo.quartermaster_location .. "\n"
+        factionDetailText = factionDetailText .. RepHub:GetColoredText("How to Farm:", {r = 1, g = 0.84, b = 0}) .. "\n"
         for i = 1, #factionAdditionalInfo.farming_methods do
             factionDetailText = factionDetailText .. " - " .. factionAdditionalInfo.farming_methods[i] .. "\n"
         end
