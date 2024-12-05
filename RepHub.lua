@@ -279,21 +279,22 @@ end
 function RepHub:IconColumnSort(libSt, rowa, rowb, column)
     local cellaValue, cellbValue = libSt:GetCell(rowa, column).value, libSt:GetCell(rowb, column).value
 
-    local cellaIconPosition = cellaValue:find("\124t ", 1, true)
-    if cellaIconPosition then
-        cellaValue = cellaValue:sub(cellaIconPosition + 3)
-    end
-
-    local cellbIconPosition = cellbValue:find("\124t ", 1, true)
-    if cellbIconPosition then
-        cellbValue = cellbValue:sub(cellbIconPosition + 3)
-    end
+    cellaValue = RepHub:StripIconFromText(cellaValue)
+    cellbValue = RepHub:StripIconFromText(cellbValue)
 
     if libSt.cols[column].sort == SORT_ASC then
         return cellaValue < cellbValue
     else
         return cellaValue > cellbValue
     end
+end
+
+function RepHub:StripIconFromText(text)
+    local iconPosition = text:find("\124t ", 1, true)
+    if iconPosition then
+        text = text:sub(iconPosition + 3)
+    end
+    return text
 end
 
 function RepHub:GetColoredText(text, color)
@@ -557,6 +558,7 @@ function RepHub:CreateRepHubFrame()
             if realrow then
                 local rowdata = RepHubTable:GetRow(realrow)
                 local factionName = RepHubTable:GetCell(rowdata, 1).value
+                factionName = RepHub:StripIconFromText(factionName)
                 RepHub:ShowFactionDetailFrame(factionName)
             end
         end,
