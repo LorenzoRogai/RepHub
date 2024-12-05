@@ -606,20 +606,6 @@ function RepHub:ShowFactionDetailFrame(factionName)
 
     local factionDetailText = ""
 
-    local factionAdditionalInfo = RepHub:GetFactionAdditionalInfo(factionName)
-
-    if factionAdditionalInfo then
-        factionDetailText = "Zones: " .. table.concat(factionAdditionalInfo.zones, ", ") .. "\n"
-        factionDetailText = factionDetailText .. "Side: " .. factionAdditionalInfo.side .. "\n"
-        factionDetailText = factionDetailText .. "Category: " .. factionAdditionalInfo.category .. "\n"
-        factionDetailText = factionDetailText .. "Quartermaster Location: " .. factionAdditionalInfo.quartermaster_location .. "\n"
-        factionDetailText = factionDetailText .. "How to Farm:\n"
-        for i = 1, #factionAdditionalInfo.farming_methods do
-            factionDetailText = factionDetailText .. " - " .. factionAdditionalInfo.farming_methods[i] .. "\n"
-        end
-        factionDetailText = factionDetailText .. "\n--------------\n\n"
-    end
-
     local sortedStandings = {}
     table.foreach(
         factionData.standings,
@@ -636,6 +622,20 @@ function RepHub:ShowFactionDetailFrame(factionName)
             factionDetailText = factionDetailText .. sortedStanding.characterName .. ": " .. sortedStanding.standing .. " (" .. RepHub:GetReputationLabel(sortedStanding.standing) .. ")\n"
         end
     )
+
+    local factionAdditionalInfo = RepHub:GetFactionAdditionalInfo(factionName)
+
+    if factionAdditionalInfo then
+        factionDetailText = factionDetailText .. "\n--------------\n\n"
+        factionDetailText = factionDetailText .. "Zones: " .. table.concat(factionAdditionalInfo.zones, ", ") .. "\n"
+        factionDetailText = factionDetailText .. "Side: " .. factionAdditionalInfo.side .. "\n"
+        factionDetailText = factionDetailText .. "Category: " .. factionAdditionalInfo.category .. "\n"
+        factionDetailText = factionDetailText .. "Quartermaster Location: " .. factionAdditionalInfo.quartermaster_location .. "\n"
+        factionDetailText = factionDetailText .. "How to Farm:\n"
+        for i = 1, #factionAdditionalInfo.farming_methods do
+            factionDetailText = factionDetailText .. " - " .. factionAdditionalInfo.farming_methods[i] .. "\n"
+        end
+    end
     
     local factionDetailScrollFrame = AceGUI:Create("ScrollFrame")
     factionDetailScrollFrame:SetFullWidth(true)
