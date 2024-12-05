@@ -1078,6 +1078,428 @@ local factionsAdditionalInfo = {
             "Complete world quests and dailies in Zereth Mortis",
             "Farm rares and complete activities in Zereth Mortis"
         }
+    },
+    {
+        name = "Ironforge",
+        side = "Alliance",
+        zones = {"Dun Morogh"},
+        category = "Classic",
+        quartermaster_location = "Ironforge, Dun Morogh",
+        farming_methods = {
+            "Complete quests in Dun Morogh",
+            "Turn in cloth for reputation",
+            "Run low-level dungeons as Alliance"
+        }
+    },
+    {
+        name = "Ratchet",
+        side = "Neutral",
+        zones = {"Northern Barrens"},
+        category = "Classic",
+        quartermaster_location = "Ratchet, Northern Barrens",
+        farming_methods = {
+            "Complete quests for the Steamwheedle Cartel",
+            "Kill pirates and enemies hostile to the Cartel"
+        }
+    },
+    {
+        name = "Sporeggar",
+        side = "Neutral",
+        zones = {"Zangarmarsh"},
+        category = "Burning Crusade",
+        quartermaster_location = "Sporeggar, Zangarmarsh",
+        farming_methods = {
+            "Complete quests for Sporeggar",
+            "Farm fungal giants for Fertile Spores and Glowcaps"
+        }
+    },
+    {
+        name = "Court of Night",
+        side = "Neutral",
+        zones = {"Ardenweald"},
+        category = "Shadowlands",
+        quartermaster_location = "Ardenweald",
+        farming_methods = {
+            "Complete Night Fae-specific Covenant activities"
+        }
+    },
+    {
+        name = "Valiance Expedition",
+        side = "Alliance",
+        zones = {"Borean Tundra", "Howling Fjord", "Dragonblight"},
+        category = "Wrath of the Lich King",
+        quartermaster_location = "Valiance Keep, Borean Tundra",
+        farming_methods = {
+            "Complete quests in Northrend",
+            "Run dungeons as Alliance in Wrath of the Lich King zones"
+        }
+    },
+    {
+        name = "Pearlfin Jinyu",
+        side = "Alliance",
+        zones = {"The Jade Forest"},
+        category = "Mists of Pandaria",
+        quartermaster_location = "Pearlfin Village, The Jade Forest",
+        farming_methods = {
+            "Complete storyline quests in The Jade Forest",
+            "Participate in faction-specific events"
+        }
+    },
+    {
+        name = "Shado-Pan Assault",
+        side = "Neutral",
+        zones = {"Isle of Thunder"},
+        category = "Mists of Pandaria",
+        quartermaster_location = "Isle of Thunder",
+        farming_methods = {
+            "Run Throne of Thunder raid",
+            "Complete daily quests in the area"
+        }
+    },
+    {
+        name = "Kurenai",
+        side = "Alliance",
+        zones = {"Nagrand"},
+        category = "Burning Crusade",
+        quartermaster_location = "Telaar, Nagrand",
+        farming_methods = {
+            "Complete quests in Nagrand",
+            "Farm Ogres for Obsidian Warbeads"
+        }
+    },
+    {
+        name = "The Frostborn",
+        side = "Neutral",
+        zones = {"The Storm Peaks"},
+        category = "Wrath of the Lich King",
+        quartermaster_location = "Frosthold, The Storm Peaks",
+        farming_methods = {
+            "Complete storyline quests in The Storm Peaks"
+        }
+    },
+    {
+        name = "Booty Bay",
+        side = "Neutral",
+        zones = {"Stranglethorn Vale"},
+        category = "Classic",
+        quartermaster_location = "Booty Bay, Stranglethorn Vale",
+        farming_methods = {
+            "Complete quests for the Steamwheedle Cartel",
+            "Kill enemies hostile to the Cartel"
+        }
+    },
+    {
+        name = "Explorers' League",
+        side = "Alliance",
+        zones = {"Various Northrend Zones"},
+        category = "Wrath of the Lich King",
+        quartermaster_location = "Valiance Keep, Borean Tundra",
+        farming_methods = {
+            "Complete quests and storyline in Northrend"
+        }
+    },
+    {
+        name = "Gilneas",
+        side = "Alliance",
+        zones = {"Silverpine Forest"},
+        category = "Faction",
+        quartermaster_location = "Gilneas, Silverpine Forest",
+        farming_methods = {
+            "Complete storyline quests for Gilneas"
+        }
+    },
+    {
+        name = "Gnomeregan",
+        side = "Alliance",
+        zones = {"Dun Morogh"},
+        category = "Classic",
+        quartermaster_location = "Ironforge, Dun Morogh",
+        farming_methods = {
+            "Complete low-level quests",
+            "Turn in cloth for reputation",
+            "Run Gnomeregan dungeon"
+        }
+    },
+    {
+        name = "Chromie",
+        side = "Neutral",
+        zones = {"Various"},
+        category = "Faction",
+        quartermaster_location = "Wyrmrest Temple, Dragonblight",
+        farming_methods = {
+            "Participate in Chromie Time-related activities"
+        }
+    },
+    {
+        name = "Stormwind",
+        side = "Alliance",
+        zones = {"Elwynn Forest"},
+        category = "Classic",
+        quartermaster_location = "Stormwind City, Elwynn Forest",
+        farming_methods = {
+            "Complete quests in Elwynn Forest",
+            "Turn in cloth for reputation",
+            "Run dungeons as Alliance"
+        }
+    },
+    {
+        name = "The Kalu'ak",
+        side = "Neutral",
+        zones = {"Howling Fjord", "Borean Tundra", "Dragonblight"},
+        category = "Wrath of the Lich King",
+        quartermaster_location = "Various Kalu'ak Villages in Northrend",
+        farming_methods = {
+            "Complete daily quests for the Kalu'ak"
+        }
+    },
+    {
+        name = "Dark Talons",
+        side = "Horde",
+        zones = {"Dragon Isles"},
+        category = "Dragonflight",
+        quartermaster_location = "The Obsidian Throne, Dragon Isles",
+        farming_methods = {
+            "Complete world quests and dailies in the Dragon Isles"
+        }
+    },
+    {
+        name = "Obsidian Warders",
+        side = "Alliance",
+        zones = {"Dragon Isles"},
+        category = "Dragonflight",
+        quartermaster_location = "The Obsidian Throne, Dragon Isles",
+        farming_methods = {
+            "Complete world quests and dailies in the Dragon Isles"
+        }
+    },
+    {
+        name = "Shado-Pan",
+        side = "Neutral",
+        zones = {"Townlong Steppes"},
+        category = "Mists of Pandaria",
+        quartermaster_location = "Shado-Pan Garrison, Townlong Steppes",
+        farming_methods = {
+            "Complete quests and dailies at Shado-Pan Garrison"
+        }
+    },
+    {
+        name = "Jogu the Drunk",
+        side = "Neutral",
+        zones = {"Valley of the Four Winds"},
+        category = "Mists of Pandaria",
+        quartermaster_location = "Halfhill Market, Valley of the Four Winds",
+        farming_methods = {
+            "Complete daily quests to increase friendship",
+            "Gift Jogu items he likes, such as green vegetables"
+        }
+    },
+    {
+        name = "Ella",
+        side = "Neutral",
+        zones = {"Valley of the Four Winds"},
+        category = "Mists of Pandaria",
+        quartermaster_location = "Halfhill Market, Valley of the Four Winds",
+        farming_methods = {
+            "Complete daily quests to increase friendship",
+            "Gift Ella items she likes, such as dishes or snacks"
+        }
+    },
+    {
+        name = "Gadgetzan",
+        side = "Neutral",
+        zones = {"Tanaris"},
+        category = "Classic",
+        quartermaster_location = "Gadgetzan, Tanaris",
+        farming_methods = {
+            "Complete quests for the Steamwheedle Cartel",
+            "Kill enemies hostile to the Cartel"
+        }
+    },
+    {
+        name = "Chee Chee",
+        side = "Neutral",
+        zones = {"Valley of the Four Winds"},
+        category = "Mists of Pandaria",
+        quartermaster_location = "Halfhill Market, Valley of the Four Winds",
+        farming_methods = {
+            "Complete daily quests to increase friendship",
+            "Gift Chee Chee items he likes, such as snacks or vegetables"
+        }
+    },
+    {
+        name = "Darnassus",
+        side = "Alliance",
+        zones = {"Teldrassil"},
+        category = "Classic",
+        quartermaster_location = "Darnassus, Teldrassil",
+        farming_methods = {
+            "Complete quests in Teldrassil",
+            "Turn in cloth for reputation",
+            "Run dungeons as Alliance"
+        }
+    },
+    {
+        name = "The Lorewalkers",
+        side = "Neutral",
+        zones = {"Pandaria"},
+        category = "Mists of Pandaria",
+        quartermaster_location = "Seat of Knowledge, Vale of Eternal Blossoms",
+        farming_methods = {
+            "Collect lore objects across Pandaria",
+            "Complete achievements related to lore discovery"
+        }
+    },
+    {
+        name = "Gina Mudclaw",
+        side = "Neutral",
+        zones = {"Valley of the Four Winds"},
+        category = "Mists of Pandaria",
+        quartermaster_location = "Halfhill Market, Valley of the Four Winds",
+        farming_methods = {
+            "Complete daily quests to increase friendship",
+            "Gift Gina items she likes, such as vegetables or drinks"
+        }
+    },
+    {
+        name = "Fish Fellreed",
+        side = "Neutral",
+        zones = {"Valley of the Four Winds"},
+        category = "Mists of Pandaria",
+        quartermaster_location = "Halfhill Market, Valley of the Four Winds",
+        farming_methods = {
+            "Complete daily quests to increase friendship",
+            "Gift Fish items she likes, such as fish or tools"
+        }
+    },
+    {
+        name = "Farmer Fung",
+        side = "Neutral",
+        zones = {"Valley of the Four Winds"},
+        category = "Mists of Pandaria",
+        quartermaster_location = "Halfhill Market, Valley of the Four Winds",
+        farming_methods = {
+            "Complete daily quests to increase friendship",
+            "Gift Farmer Fung items he likes, such as seeds or vegetables"
+        }
+    },
+    {
+        name = "The Ashen Verdict",
+        side = "Neutral",
+        zones = {"Icecrown Citadel"},
+        category = "Wrath of the Lich King",
+        quartermaster_location = "Icecrown Citadel Entrance",
+        farming_methods = {
+            "Run Icecrown Citadel raid"
+        }
+    },
+    {
+        name = "The Scale of the Sands",
+        side = "Neutral",
+        zones = {"Mount Hyjal"},
+        category = "Burning Crusade",
+        quartermaster_location = "Hyjal Summit, Caverns of Time",
+        farming_methods = {
+            "Run Hyjal Summit raid"
+        }
+    },
+    {
+        name = "The Silver Covenant",
+        side = "Alliance",
+        zones = {"Icecrown", "Dalaran"},
+        category = "Wrath of the Lich King",
+        quartermaster_location = "Argent Tournament Grounds, Icecrown",
+        farming_methods = {
+            "Participate in Argent Tournament dailies",
+            "Complete faction-specific activities"
+        }
+    },
+    {
+        name = "Kirin Tor Offensive",
+        side = "Neutral",
+        zones = {"Isle of Thunder"},
+        category = "Mists of Pandaria",
+        quartermaster_location = "Isle of Thunder",
+        farming_methods = {
+            "Complete daily quests and storyline on Isle of Thunder"
+        }
+    },
+    {
+        name = "Old Hillpaw",
+        side = "Neutral",
+        zones = {"Valley of the Four Winds"},
+        category = "Mists of Pandaria",
+        quartermaster_location = "Halfhill Market, Valley of the Four Winds",
+        farming_methods = {
+            "Complete daily quests to increase friendship",
+            "Gift Old Hillpaw items he likes, such as grains or food"
+        }
+    },
+    {
+        name = "The Avowed",
+        side = "Neutral",
+        zones = {"Revendreth"},
+        category = "Shadowlands",
+        quartermaster_location = "Halls of Atonement, Revendreth",
+        farming_methods = {
+            "Farm mobs in Halls of Atonement",
+            "Complete daily quests for The Avowed"
+        }
+    },
+    {
+        name = "Exodar",
+        side = "Alliance",
+        zones = {"Azuremyst Isle"},
+        category = "Classic",
+        quartermaster_location = "The Exodar, Azuremyst Isle",
+        farming_methods = {
+            "Complete quests in Azuremyst Isle",
+            "Turn in cloth for reputation",
+            "Run low-level dungeons as Alliance"
+        }
+    },
+    {
+        name = "Glimmerogg Racer",
+        side = "Neutral",
+        zones = {"Zaralek Cavern"},
+        category = "Dragonflight",
+        quartermaster_location = "Glimmerogg, Zaralek Cavern",
+        farming_methods = {
+            "Participate in racing events in Zaralek Cavern",
+            "Complete Glimmerogg quests"
+        }
+    },
+    {
+        name = "Haohan Mudclaw",
+        side = "Neutral",
+        zones = {"Valley of the Four Winds"},
+        category = "Mists of Pandaria",
+        quartermaster_location = "Halfhill Market, Valley of the Four Winds",
+        farming_methods = {
+            "Complete daily quests to increase friendship",
+            "Gift Haohan items he likes, such as vegetables or drinks"
+        }
+    },
+    {
+        name = "Tushui Pandaren",
+        side = "Alliance",
+        zones = {"The Wandering Isle"},
+        category = "Faction",
+        quartermaster_location = "Stormwind City, Elwynn Forest",
+        farming_methods = {
+            "Complete faction-related activities",
+            "Run dungeons as Alliance"
+        }
+    },
+    {
+        name = "Stormpike Guard",
+        side = "Alliance",
+        zones = {"Alterac Valley"},
+        category = "PvP",
+        quartermaster_location = "Stormpike Base, Alterac Valley",
+        farming_methods = {
+            "Participate in Alterac Valley battlegrounds",
+            "Turn in battleground tokens for reputation"
+        }
     }
 }
 
