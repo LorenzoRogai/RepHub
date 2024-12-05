@@ -1500,6 +1500,157 @@ local factionsAdditionalInfo = {
             "Participate in Alterac Valley battlegrounds",
             "Turn in battleground tokens for reputation"
         }
+    },
+    {
+        name = "Bizmo's Brawlpub (Season 1)",
+        faction_side = "Alliance",
+        zones = {"Bizmo's Brawlpub, Deeprun Tram"},
+        category = "PvP",
+        quartermaster_location = "Bizmo's Brawlpub, Deeprun Tram",
+        farming_methods = {
+            "Participate in Brawler's Guild fights during Season 1",
+            "Complete achievements and challenges for rewards"
+        }
+    },
+    {
+        name = "Wrynn's Vanguard",
+        faction_side = "Alliance",
+        zones = {"Ashran"},
+        category = "PvP",
+        quartermaster_location = "Stormshield, Ashran",
+        farming_methods = {
+            "Participate in Ashran battles",
+            "Complete PvP quests in Ashran"
+        }
+    },
+    {
+        name = "Bizmo's Brawlpub (Season 2)",
+        faction_side = "Alliance",
+        zones = {"Bizmo's Brawlpub, Deeprun Tram"},
+        category = "PvP",
+        quartermaster_location = "Bizmo's Brawlpub, Deeprun Tram",
+        farming_methods = {
+            "Participate in Brawler's Guild fights during Season 2",
+            "Complete achievements and challenges for rewards"
+        }
+    },
+    {
+        name = "The League of Arathor",
+        faction_side = "Alliance",
+        zones = {"Arathi Basin"},
+        category = "PvP",
+        quartermaster_location = "Refuge Pointe, Arathi Highlands",
+        farming_methods = {
+            "Participate in Arathi Basin battlegrounds",
+            "Turn in battleground tokens for reputation"
+        }
+    },
+    {
+        name = "Silverwing Sentinels",
+        faction_side = "Alliance",
+        zones = {"Warsong Gulch"},
+        category = "PvP",
+        quartermaster_location = "Silverwing Grove, Ashenvale",
+        farming_methods = {
+            "Participate in Warsong Gulch battlegrounds",
+            "Turn in battleground tokens for reputation"
+        }
+    },
+    {
+        name = "Wintersaber Trainers",
+        faction_side = "Alliance",
+        zones = {"Winterspring"},
+        category = "Quest",
+        quartermaster_location = "Frostsaber Rock, Winterspring",
+        farming_methods = {
+            "Complete repeatable quests for the Wintersaber Trainers"
+        }
+    },
+    {
+        name = "Tina Mudclaw",
+        faction_side = "Neutral",
+        zones = {"Valley of the Four Winds"},
+        category = "Mists of Pandaria",
+        quartermaster_location = "Halfhill Market, Valley of the Four Winds",
+        farming_methods = {
+            "Complete daily friendship quests for Tina Mudclaw",
+            "Gift Tina items she likes, such as furniture or drinks"
+        }
+    },
+    {
+        name = "Nat Pagle",
+        faction_side = "Neutral",
+        zones = {"Krasarang Wilds"},
+        category = "Fishing",
+        quartermaster_location = "Anglers Wharf, Krasarang Wilds",
+        farming_methods = {
+            "Complete daily fishing quests",
+            "Catch rare fish and turn them in to Nat Pagle"
+        }
+    },
+    {
+        name = "Talonpriest Ishaal",
+        faction_side = "Neutral",
+        zones = {"Spires of Arak"},
+        category = "Quest",
+        quartermaster_location = "Shadowmoon Valley or Spires of Arak",
+        farming_methods = {
+            "Complete Talonpriest Ishaal's quests",
+            "Participate in Shadowmoon or Arak storylines"
+        }
+    },
+    {
+        name = "Everlook",
+        faction_side = "Neutral",
+        zones = {"Winterspring"},
+        category = "Classic",
+        quartermaster_location = "Everlook, Winterspring",
+        farming_methods = {
+            "Complete quests for the Steamwheedle Cartel",
+            "Kill enemies hostile to the Cartel"
+        }
+    },
+    {
+        name = "Sho",
+        faction_side = "Neutral",
+        zones = {"Valley of the Four Winds"},
+        category = "Mists of Pandaria",
+        quartermaster_location = "Halfhill Market, Valley of the Four Winds",
+        farming_methods = {
+            "Complete daily friendship quests for Sho",
+            "Gift Sho items she likes, such as food or drinks"
+        }
+    },
+    {
+        name = "Shang Xi's Academy",
+        faction_side = "Neutral",
+        zones = {"The Wandering Isle"},
+        category = "Starting Zone",
+        quartermaster_location = "Shang Xi's Academy, The Wandering Isle",
+        farming_methods = {
+            "Complete storyline quests on the Wandering Isle"
+        }
+    },
+    {
+        name = "Sha'tari Skyguard",
+        faction_side = "Neutral",
+        zones = {"Terokkar Forest", "Blade's Edge Mountains"},
+        category = "Quest",
+        quartermaster_location = "Blackwing Landing, Terokkar Forest",
+        farming_methods = {
+            "Complete daily quests for the Sha'tari Skyguard",
+            "Farm mobs in Skettis for Apexis Shards"
+        }
+    },
+    {
+        name = "Delvar Ironfist",
+        faction_side = "Neutral",
+        zones = {"Shadowmoon Valley"},
+        category = "Follower",
+        quartermaster_location = "Lunarfall Garrison, Shadowmoon Valley",
+        farming_methods = {
+            "Complete quests to recruit Delvar Ironfist as a Garrison follower"
+        }
     }
 }
 
