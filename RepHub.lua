@@ -420,6 +420,33 @@ function RepHub:GetFactionAdditionalInfo(factionName)
     return factionAdditionalInfo
 end
 
+function RepHub:GetTopCharacter()
+    local topCharacterTable, topCharacterName, topCharacterReputationsCount = {}, "", 0
+    table.foreach(
+        self.db.global.reputationList,
+        function(_, factionData)
+            table.foreach(
+                factionData.standings,
+                function(characterName, standing)
+                    topCharacterTable[characterName] = (topCharacterTable[characterName] or 0) + 1
+                end
+            )
+        end
+    )
+
+    table.foreach(
+        topCharacterTable,
+        function(characterName, reputationsCount)
+            if reputationsCount > topCharacterReputationsCount then
+                topCharacterName = characterName
+                topCharacterReputationsCount = reputationsCount
+            end
+        end
+    )
+
+    return topCharacterName, topCharacterReputationsCount
+end
+
 -- GUI
 
 function RepHub:CreateRepHubFrame()
@@ -464,7 +491,8 @@ function RepHub:CreateRepHubFrame()
     -- Stats
     local StatsLabel = AceGUI:Create("Label")
     StatsLabel:SetFullWidth(true)
-    StatsLabel:SetText("Total reputations: " .. RepHub:GetTableLength(self.db.global.reputationList)  .. " | Total characters: " .. #self.db.global.characterNames)
+    local topCharacterName, topCharacterReputationsCount = RepHub:GetTopCharacter()
+    StatsLabel:SetText("Total reputations: " .. RepHub:GetTableLength(self.db.global.reputationList)  .. " | Total characters: " .. #self.db.global.characterNames .. " | Top character: " .. topCharacterName .. " (" .. topCharacterReputationsCount .. ")")
     RepHubFrame:AddChild(StatsLabel)
 
     -- Search
