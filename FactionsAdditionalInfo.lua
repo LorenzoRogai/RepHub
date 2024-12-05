@@ -1503,7 +1503,7 @@ local factionsAdditionalInfo = {
     },
     {
         name = "Bizmo's Brawlpub (Season 1)",
-        faction_side = "Alliance",
+        side = "Alliance",
         zones = {"Bizmo's Brawlpub, Deeprun Tram"},
         category = "PvP",
         quartermaster_location = "Bizmo's Brawlpub, Deeprun Tram",
@@ -1514,7 +1514,7 @@ local factionsAdditionalInfo = {
     },
     {
         name = "Wrynn's Vanguard",
-        faction_side = "Alliance",
+        side = "Alliance",
         zones = {"Ashran"},
         category = "PvP",
         quartermaster_location = "Stormshield, Ashran",
@@ -1525,7 +1525,7 @@ local factionsAdditionalInfo = {
     },
     {
         name = "Bizmo's Brawlpub (Season 2)",
-        faction_side = "Alliance",
+        side = "Alliance",
         zones = {"Bizmo's Brawlpub, Deeprun Tram"},
         category = "PvP",
         quartermaster_location = "Bizmo's Brawlpub, Deeprun Tram",
@@ -1536,7 +1536,7 @@ local factionsAdditionalInfo = {
     },
     {
         name = "The League of Arathor",
-        faction_side = "Alliance",
+        side = "Alliance",
         zones = {"Arathi Basin"},
         category = "PvP",
         quartermaster_location = "Refuge Pointe, Arathi Highlands",
@@ -1547,7 +1547,7 @@ local factionsAdditionalInfo = {
     },
     {
         name = "Silverwing Sentinels",
-        faction_side = "Alliance",
+        side = "Alliance",
         zones = {"Warsong Gulch"},
         category = "PvP",
         quartermaster_location = "Silverwing Grove, Ashenvale",
@@ -1558,7 +1558,7 @@ local factionsAdditionalInfo = {
     },
     {
         name = "Wintersaber Trainers",
-        faction_side = "Alliance",
+        side = "Alliance",
         zones = {"Winterspring"},
         category = "Quest",
         quartermaster_location = "Frostsaber Rock, Winterspring",
@@ -1568,7 +1568,7 @@ local factionsAdditionalInfo = {
     },
     {
         name = "Tina Mudclaw",
-        faction_side = "Neutral",
+        side = "Neutral",
         zones = {"Valley of the Four Winds"},
         category = "Mists of Pandaria",
         quartermaster_location = "Halfhill Market, Valley of the Four Winds",
@@ -1579,7 +1579,7 @@ local factionsAdditionalInfo = {
     },
     {
         name = "Nat Pagle",
-        faction_side = "Neutral",
+        side = "Neutral",
         zones = {"Krasarang Wilds"},
         category = "Fishing",
         quartermaster_location = "Anglers Wharf, Krasarang Wilds",
@@ -1590,7 +1590,7 @@ local factionsAdditionalInfo = {
     },
     {
         name = "Talonpriest Ishaal",
-        faction_side = "Neutral",
+        side = "Neutral",
         zones = {"Spires of Arak"},
         category = "Quest",
         quartermaster_location = "Shadowmoon Valley or Spires of Arak",
@@ -1601,7 +1601,7 @@ local factionsAdditionalInfo = {
     },
     {
         name = "Everlook",
-        faction_side = "Neutral",
+        side = "Neutral",
         zones = {"Winterspring"},
         category = "Classic",
         quartermaster_location = "Everlook, Winterspring",
@@ -1612,7 +1612,7 @@ local factionsAdditionalInfo = {
     },
     {
         name = "Sho",
-        faction_side = "Neutral",
+        side = "Neutral",
         zones = {"Valley of the Four Winds"},
         category = "Mists of Pandaria",
         quartermaster_location = "Halfhill Market, Valley of the Four Winds",
@@ -1623,7 +1623,7 @@ local factionsAdditionalInfo = {
     },
     {
         name = "Shang Xi's Academy",
-        faction_side = "Neutral",
+        side = "Neutral",
         zones = {"The Wandering Isle"},
         category = "Starting Zone",
         quartermaster_location = "Shang Xi's Academy, The Wandering Isle",
@@ -1633,7 +1633,7 @@ local factionsAdditionalInfo = {
     },
     {
         name = "Sha'tari Skyguard",
-        faction_side = "Neutral",
+        side = "Neutral",
         zones = {"Terokkar Forest", "Blade's Edge Mountains"},
         category = "Quest",
         quartermaster_location = "Blackwing Landing, Terokkar Forest",
@@ -1644,7 +1644,7 @@ local factionsAdditionalInfo = {
     },
     {
         name = "Delvar Ironfist",
-        faction_side = "Neutral",
+        side = "Neutral",
         zones = {"Shadowmoon Valley"},
         category = "Follower",
         quartermaster_location = "Lunarfall Garrison, Shadowmoon Valley",
