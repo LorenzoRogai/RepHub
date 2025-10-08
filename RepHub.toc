@@ -1,4 +1,4 @@
-## Interface: 110200
+## Interface: 110205
 ## Title: RepHub
 ## Notes: RepHub is a simple account-wide reputation tracker
 ## Author: lorigio
