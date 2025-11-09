@@ -200,11 +200,31 @@ function RepHub:ResetDB()
     ReloadUI()
 end
 
+function RepHub:csvExport()
+    -- Open a basic window with title CSV Export and a multiline editbox containing the CSV data
+    local csvExportFrame = AceGUI:Create("Frame")
+    csvExportFrame:SetTitle("RepHub - CSV Export")
+    csvExportFrame:SetStatusText("Copy the data above and paste it into your spreadsheet application")
+    csvExportFrame:SetCallback("OnClose", function(widget) AceGUI:Release(widget) end)
+    csvExportFrame:SetWidth(600)
+
+    local csvTextBox = AceGUI:Create("MultiLineEditBox")
+    csvTextBox:SetLabel("CSV Data")
+    csvTextBox:SetFullWidth(true)
+    csvTextBox:SetNumLines(20)
+    csvTextBox:DisableButton(true) -- no need for an extra button here
+    csvTextBox:SetText(RepHub:GetRepHubTableDataCSV())
+    csvTextBox:HighlightText(0, -1)
+    csvExportFrame:AddChild(csvTextBox)
+end
+
 -- Commands
 
 function RepHub:HandleCommand(input)
     if input == "resetdb" then
         RepHub:ResetDB()
+    elseif input == "csv" then
+        RepHub:csvExport()
     end
 end
 
@@ -318,6 +338,44 @@ function RepHub:GetReputationLabel(standing)
     end
     
     return reputationLabelResult
+end
+
+function RepHub:GetRepHubTableDataCSV()
+    local csvData = "Reputation Name,Group,Rep,Highest Standing,H. S. Char Name,Char Count\n"
+
+    table.foreach(
+        self.db.global.reputationList,
+        function(factionID, factionData)
+            if not factionData.isHeader or (factionData.isHeader and factionData.isHeaderWithRep) then
+                local highestStandingText,highestStandingRep,
+                    highestStandingCharacterNameText,
+                    charCountText = "", "", "", ""
+                if factionData.isAccountWide then
+                    highestStandingText = "--"
+                    highestStandingRep = "0"
+                    highestStandingCharacterNameText = "Account-wide"
+                    charCountText = "--"
+                else
+                    highestStandingText, highestStandingCharacterNameText = RepHub:FindHighestStanding(factionData.standings)
+                    local reputationLabel = RepHub:GetReputationLabel(highestStandingText)
+                    highestStandingRep = highestStandingText 
+                    highestStandingText = reputationLabel
+                    charCountText = RepHub:GetTableLength(factionData.standings)
+                end
+
+                csvData = csvData .. string.format('"%s","%s","%s","%s","%s","%s"\n',
+                    factionData.name,
+                    factionData.currentGroup,
+                    highestStandingRep,
+                    highestStandingText,
+                    highestStandingCharacterNameText,
+                    charCountText
+                )
+            end
+        end
+    )
+
+    return csvData
 end
 
 function RepHub:GetRepHubTableData()
