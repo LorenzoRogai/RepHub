@@ -207,6 +207,7 @@ function RepHub:csvExport()
     csvExportFrame:SetStatusText("Copy the data above and paste it into your spreadsheet application")
     csvExportFrame:SetCallback("OnClose", function(widget) AceGUI:Release(widget) end)
     csvExportFrame:SetWidth(600)
+    csvExportFrame:SetHeight(375)
 
     local csvTextBox = AceGUI:Create("MultiLineEditBox")
     csvTextBox:SetLabel("CSV Data")
