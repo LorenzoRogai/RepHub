@@ -18,6 +18,7 @@ Commands:
 ---------
 
 -   /rephub resetdb: Reset the saved database
+-   /rephub csv: Export the reputation list to csv
 
 Please note:
 
