@@ -156,40 +156,44 @@ function RepHub:RefreshReputationGlobalDB()
     local factionIndex = 1
     while (factionIndex <= numFactions) do
         local factionData = C_Reputation.GetFactionDataByIndex(factionIndex)
-        if factionData.isHeader then
-            if not factionData.isHeaderWithRep and not factionData.isChild then
-                currentGroup = factionData.name
+        if factionData then
+            if factionData.isHeader then
+                if not factionData.isHeaderWithRep and not factionData.isChild then
+                    currentGroup = factionData.name
+                end
+
+                if factionData.isCollapsed then -- C_Reputation.ExpandAllFactionHeaders() doesn't work correctly, use this workaround instead
+                    C_Reputation.ExpandFactionHeader(factionIndex)
+                    numFactions = C_Reputation.GetNumFactions()
+                end
             end
 
-            if factionData.isCollapsed then -- C_Reputation.ExpandAllFactionHeaders() doesn't work correctly, use this workaround instead
-                C_Reputation.ExpandFactionHeader(factionIndex)
-                numFactions = C_Reputation.GetNumFactions()
+            if not self.db.global.reputationList[factionData.factionID] then
+                self.db.global.reputationList[factionData.factionID] = {
+                    ["name"] = factionData.name,
+                    ["currentGroup"] = currentGroup,
+                    ["isHeader"] = factionData.isHeader,
+                    ["isHeaderWithRep"] = factionData.isHeaderWithRep,
+                    ["isAccountWide"] = factionData.isAccountWide,
+                    ["standings"] = {}
+                }
             end
-        end
 
-        if not self.db.global.reputationList[factionData.factionID] then
-            self.db.global.reputationList[factionData.factionID] = {
-                ["name"] = factionData.name,
-                ["currentGroup"] = currentGroup,
-                ["isHeader"] = factionData.isHeader,
-                ["isHeaderWithRep"] = factionData.isHeaderWithRep,
-                ["isAccountWide"] = factionData.isAccountWide,
-                ["standings"] = {}
-            }
-        end
+            local currentStanding = factionData.currentStanding
 
-        local currentStanding = factionData.currentStanding
-
-        if not factionData.isAccountWide then
-            local friendshipReputationData = C_GossipInfo.GetFriendshipReputation(factionData.factionID)
-            if friendshipReputationData and friendshipReputationData.friendshipFactionID ~= 0 then
-                currentStanding = friendshipReputationData.standing
+            if not factionData.isAccountWide then
+                local friendshipReputationData = C_GossipInfo.GetFriendshipReputation(factionData.factionID)
+                if friendshipReputationData and friendshipReputationData.friendshipFactionID ~= 0 then
+                    currentStanding = friendshipReputationData.standing
+                end
             end
+
+            self.db.global.reputationList[factionData.factionID].standings[characterName] = currentStanding
+
+            factionIndex = factionIndex + 1
+        else
+            factionIndex = factionIndex + 1
         end
-
-        self.db.global.reputationList[factionData.factionID].standings[characterName] = currentStanding
-
-        factionIndex = factionIndex + 1
     end
 
     RepHub:HandleReputationListCollapsedState(true)
@@ -453,7 +457,7 @@ function RepHub:HandleReputationListCollapsedState(restoreState)
     local factionIndex = 1
     while (factionIndex <= numFactions) do
         local factionData = C_Reputation.GetFactionDataByIndex(factionIndex)
-        if factionData.isHeader then
+        if factionData and factionData.isHeader then
             if not restoreState and factionData.isCollapsed then
                 reputationListCollapsedState[factionData.factionID] = true
             elseif restoreState and reputationListCollapsedState[factionData.factionID] then
