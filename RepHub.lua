@@ -230,6 +230,17 @@ function RepHub:HandleCommand(input)
         RepHub:ResetDB()
     elseif input == "csv" then
         RepHub:csvExport()
+    elseif input == "minimap" then
+        self.db.profile.minimap.hide = not self.db.profile.minimap.hide
+        if self.db.profile.minimap.hide then
+            LibDBIcon:Hide("RepHub")
+            print("RepHub: Minimap icon hidden. Use /rephub minimap to show it again.")
+        else
+            LibDBIcon:Show("RepHub")
+            print("RepHub: Minimap icon shown.")
+        end
+    else
+        print("RepHub commands: /rephub minimap | /rephub csv | /rephub resetdb")
     end
 end
 
