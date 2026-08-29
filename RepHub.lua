@@ -81,6 +81,7 @@ function RepHub:OnInitialize()
             minimap = {
                 hide = false,
             },
+            frameStatus = {},
         },
         global = {
             characterNames = {},
@@ -527,9 +528,12 @@ function RepHub:CreateRepHubFrame()
     RepHubFrame = AceGUI:Create("Frame")
     RepHubFrame:SetTitle("RepHub")
     RepHubFrame:SetStatusText("RepHub is a simple account-wide reputation tracker")
-    RepHubFrame:EnableResize(false) -- We also need this to remove the resize icon in the bottom right corner
+    RepHubFrame:EnableResize(true)
     RepHubFrame.frame:SetMovable(true)
-    RepHubFrame.frame:SetResizable(false)
+    RepHubFrame.frame:SetResizable(true)
+    RepHubFrame.frame:SetResizeBounds(720, 400)
+    RepHubFrame.frame:SetClampedToScreen(true)
+    RepHubFrame:SetStatusTable(self.db.profile.frameStatus)
     RepHubFrame.frame:RegisterEvent("UPDATE_FACTION")
     RepHubFrame.frame:RegisterEvent("CVAR_UPDATE")
     RepHubFrame.frame:SetScript(
@@ -575,7 +579,7 @@ function RepHub:CreateRepHubFrame()
     SearchGroup:SetFullWidth(true)
 
     local SearchBox = AceGUI:Create("EditBox")
-    SearchBox:SetWidth(465)
+    SearchBox:SetRelativeWidth(0.65)
     SearchBox:SetLabel("Search:")
     SearchBox:SetCallback(
         "OnEnterPressed",
@@ -627,24 +631,38 @@ function RepHub:CreateRepHubFrame()
     RepHubFrame:AddChild(SearchGroup)
 
     -- Table
+    -- Base column widths at the minimum frame width of 720px.
+    -- Columns 1 (Reputation Name), 2 (Group), 3 (Highest Standing), and
+    -- 4 (H. S. Char Name) are "expandable" and grow proportionally when the
+    -- window is made wider.  Column 5 (Char Count) stays at a fixed width.
+    local BASE_COL_WIDTHS = { 155, 140, 140, 130, 80 }
+    local FIXED_COL_TOTAL = BASE_COL_WIDTHS[5]                                 -- 80
+    local EXPAND_COL_BASE = BASE_COL_WIDTHS[1] + BASE_COL_WIDTHS[2]
+                           + BASE_COL_WIDTHS[3] + BASE_COL_WIDTHS[4]           -- 565
+    local BASE_TOTAL_COL_WIDTH = FIXED_COL_TOTAL + EXPAND_COL_BASE             -- 645
+    -- lib-st adds 33px of internal padding (13 left + 20 right/scrollbar)
+    local LIBST_PADDING = 33
+    -- AceGUI content area = frame width - 34
+    local ACEGUI_CONTENT_INSET = 34
+
     local columnsArr = {
         {
-            ["name"] = "Reputation Name", ["width"] = 155, ["comparesort"] = function (libSt, rowa, rowb, column)
+            ["name"] = "Reputation Name", ["width"] = BASE_COL_WIDTHS[1], ["comparesort"] = function (libSt, rowa, rowb, column)
                 return RepHub:IconColumnSort(libSt, rowa, rowb, column)
             end
         },
         {
-            ["name"] = "Group", ["width"] = 140, ["comparesort"] = function (libSt, rowa, rowb, column)
+            ["name"] = "Group", ["width"] = BASE_COL_WIDTHS[2], ["comparesort"] = function (libSt, rowa, rowb, column)
                 return RepHub:IconColumnSort(libSt, rowa, rowb, column)
             end
         },
         {
-            ["name"] = "Highest Standing", ["width"] = 105, ["sort"] = "asc", ["comparesort"] = function (libSt, rowa, rowb, column)
+            ["name"] = "Highest Standing", ["width"] = BASE_COL_WIDTHS[3], ["sort"] = "asc", ["comparesort"] = function (libSt, rowa, rowb, column)
                 return RepHub:HighestStandingSort(libSt, rowa, rowb, column)
             end
         },
-        { ["name"] = "H. S. Char Name", ["width"] = 155, },
-        { ["name"] = "Char Count", ["width"] = 65, },
+        { ["name"] = "H. S. Char Name", ["width"] = BASE_COL_WIDTHS[4], },
+        { ["name"] = "Char Count", ["width"] = BASE_COL_WIDTHS[5], },
     }
 
     local RepHubTableGroup = AceGUI:Create("SimpleGroup")
@@ -653,7 +671,8 @@ function RepHub:CreateRepHubFrame()
     RepHubTableGroup:SetLayout("Fill")
 
     local ScrollingTable = LibStub("ScrollingTable")
-    RepHubTable = ScrollingTable:CreateST(columnsArr, 23, nil, nil, RepHubTableGroup.frame)
+    local DEFAULT_ROW_HEIGHT = 15
+    RepHubTable = ScrollingTable:CreateST(columnsArr, 23, DEFAULT_ROW_HEIGHT, nil, RepHubTableGroup.frame)
     RepHubTable:SetData(RepHub:GetRepHubTableData())
     RepHubTable:RegisterEvents({
         ["OnClick"] = function (rowFrame, cellFrame, data, cols, row, realrow, column, table, button, ...)
@@ -665,7 +684,139 @@ function RepHub:CreateRepHubFrame()
         end,
     })
 
+    -- Reposition the lib-st frame within the table group.
+    -- lib-st places its header row ABOVE its own frame (anchored at the
+    -- frame's top edge, growing upward).  We need to push the lib-st frame
+    -- down by one row height so the header doesn't overlap the search bar.
+    -- We use a single-point TOPLEFT anchor and let lib-st manage its own
+    -- height via SetDisplayRows/SetHeight.  Width is set explicitly in
+    -- UpdateColumnWidths.
+    RepHubTable.frame:ClearAllPoints()
+    RepHubTable.frame:SetPoint("TOPLEFT", RepHubTableGroup.frame, "TOPLEFT", 0, -DEFAULT_ROW_HEIGHT)
+
     RepHubFrame:AddChild(RepHubTableGroup)
+
+    -- Full-width drag bar across the top of the frame (Problem 1 fix)
+    local dragBar = CreateFrame("Frame", nil, RepHubFrame.frame)
+    dragBar:SetPoint("TOPLEFT", RepHubFrame.frame, "TOPLEFT", 0, 0)
+    dragBar:SetPoint("TOPRIGHT", RepHubFrame.frame, "TOPRIGHT", 0, 0)
+    dragBar:SetHeight(27) -- matches AceGUI content offset (content starts at y = -27)
+    dragBar:EnableMouse(true)
+    dragBar:RegisterForDrag("LeftButton")
+    dragBar:SetScript("OnDragStart", function(self)
+        self:GetParent():StartMoving()
+    end)
+    dragBar:SetScript("OnDragStop", function(self)
+        local frame = self:GetParent()
+        frame:StopMovingOrSizing()
+        -- Persist position like AceGUI's MoverSizer_OnMouseUp does
+        local widget = frame.obj
+        if widget then
+            local status = widget.status or widget.localstatus
+            status.width = frame:GetWidth()
+            status.height = frame:GetHeight()
+            status.top = frame:GetTop()
+            status.left = frame:GetLeft()
+        end
+    end)
+    -- Place above content but below any close buttons (AceGUI Frame has no
+    -- top-right close button; the close button is at BOTTOMRIGHT)
+    dragBar:SetFrameLevel(RepHubFrame.frame:GetFrameLevel() + 10)
+
+    -- Helper: update column widths in the lib-st table to fill available width
+    local function UpdateColumnWidths(frameWidth)
+        local contentWidth = frameWidth - ACEGUI_CONTENT_INSET
+        local availableForCols = contentWidth - LIBST_PADDING
+        if availableForCols < BASE_TOTAL_COL_WIDTH then
+            availableForCols = BASE_TOTAL_COL_WIDTH
+        end
+        local expandBudget = availableForCols - FIXED_COL_TOTAL
+        -- Distribute expandBudget proportionally among expandable columns (1, 2, 3, 4)
+        local col1Width = math.floor(expandBudget * (BASE_COL_WIDTHS[1] / EXPAND_COL_BASE))
+        local col2Width = math.floor(expandBudget * (BASE_COL_WIDTHS[2] / EXPAND_COL_BASE))
+        local col3Width = math.floor(expandBudget * (BASE_COL_WIDTHS[3] / EXPAND_COL_BASE))
+        local col4Width = expandBudget - col1Width - col2Width - col3Width -- remainder to avoid rounding gaps
+
+        -- Update column definitions
+        RepHubTable.cols[1].width = col1Width
+        RepHubTable.cols[2].width = col2Width
+        RepHubTable.cols[3].width = col3Width
+        RepHubTable.cols[4].width = col4Width
+        -- Fixed column stays the same
+        RepHubTable.cols[5].width = BASE_COL_WIDTHS[5]
+
+        -- Update header cell widths
+        if RepHubTable.head and RepHubTable.head.cols then
+            for j = 1, #RepHubTable.cols do
+                local headCol = RepHubTable.head.cols[j]
+                if headCol then
+                    headCol:SetWidth(RepHubTable.cols[j].width)
+                end
+            end
+        end
+
+        -- Update row cell widths
+        if RepHubTable.rows then
+            for i = 1, #RepHubTable.rows do
+                local row = RepHubTable.rows[i]
+                if row and row.cols then
+                    for j = 1, #RepHubTable.cols do
+                        local cellFrame = row.cols[j]
+                        if cellFrame then
+                            cellFrame:SetWidth(RepHubTable.cols[j].width)
+                            if cellFrame.text then
+                                cellFrame.text:SetWidth(RepHubTable.cols[j].width - 5) -- 2*lrpadding
+                            end
+                        end
+                    end
+                end
+            end
+        end
+    end
+
+    -- Dynamic resize: adjust table group height, row count, and column widths.
+    --
+    -- Height budget breakdown (approximate):
+    --   Title bar chrome:     27 px  (AceGUI Frame content starts at y = -27)
+    --   Status bar chrome:    40 px  (AceGUI Frame content ends at y = +40)
+    --   StatsLabel:           ~18 px
+    --   SearchGroup:          ~44 px (label + edit box / dropdown)
+    --   AceGUI layout slack:  ~6 px  (rounding, internal spacing)
+    --                        --------
+    --   Total non-table:     ~135 px
+    --
+    -- Inside the table group we reserve DEFAULT_ROW_HEIGHT (15 px) at the
+    -- top for the lib-st header (see TOPLEFT offset above).  The remaining
+    -- space is for data rows.  lib-st adds 10 px of internal padding to its
+    -- frame height, so usable row space = groupHeight - headerHeight - 10.
+    local NON_TABLE_OVERHEAD = 135
+    local HEADER_HEIGHT = DEFAULT_ROW_HEIGHT  -- header sits inside the group but above the lib-st frame
+
+    RepHubFrame.frame:HookScript("OnSizeChanged", function(self, width, height)
+        -- Update column widths first so that when SetDisplayRows triggers
+        -- a Refresh(), the rows are already sized correctly.
+        UpdateColumnWidths(width)
+
+        -- Compute how much vertical space the table group gets.
+        local tableGroupHeight = height - NON_TABLE_OVERHEAD
+        if tableGroupHeight < 200 then tableGroupHeight = 200 end
+        RepHubTableGroup:SetHeight(tableGroupHeight)
+
+        -- The lib-st frame sits HEADER_HEIGHT pixels below the group top.
+        -- Inside the lib-st frame there is 10 px of internal padding.
+        -- So usable space for data rows = groupHeight - headerHeight - 10.
+        local rowSpace = tableGroupHeight - HEADER_HEIGHT - 10
+        local newRowCount = math.floor(rowSpace / DEFAULT_ROW_HEIGHT)
+        if newRowCount < 1 then newRowCount = 1 end
+        RepHubTable:SetDisplayRows(newRowCount, DEFAULT_ROW_HEIGHT)
+
+        -- Explicitly set the lib-st frame width to match the content area.
+        local contentWidth = width - ACEGUI_CONTENT_INSET
+        RepHubTable.frame:SetWidth(contentWidth)
+
+        -- Tell AceGUI to re-run its layout engine for all child widgets.
+        RepHubFrame:DoLayout()
+    end)
 
     RepHubFrame.frame:Hide()
 
